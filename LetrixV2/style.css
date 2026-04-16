@@ -1,0 +1,47 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Nunito', sans-serif; background: #FFF9EC; min-height: 100vh; overflow-x: hidden; position: relative; }
+.bg-bubbles { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+.bubble { position: absolute; border-radius: 50%; opacity: 0.13; animation: float-bubble 6s ease-in-out infinite; }
+@keyframes float-bubble { 0%, 100% { transform: translateY(0px) scale(1); } 50% { transform: translateY(-18px) scale(1.05); } }
+.bubble:nth-child(1) { width: 140px; height: 140px; background: #FF6B6B; top: 5%; left: 3%; animation-delay: 0s; }
+.bubble:nth-child(2) { width: 90px; height: 90px; background: #4ECDC4; top: 20%; right: 6%; animation-delay: 1.2s; }
+.bubble:nth-child(3) { width: 70px; height: 70px; background: #FFE66D; top: 60%; left: 8%; animation-delay: 2.4s; }
+.bubble:nth-child(4) { width: 110px; height: 110px; background: #A29BFE; bottom: 8%; right: 4%; animation-delay: 0.8s; }
+.bubble:nth-child(5) { width: 60px; height: 60px; background: #FD79A8; bottom: 22%; left: 18%; animation-delay: 3s; }
+.bubble:nth-child(6) { width: 80px; height: 80px; background: #55EFC4; top: 40%; right: 14%; animation-delay: 1.8s; }
+
+.floating-letters { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+.fl { position: absolute; font-family: 'Fredoka One', cursive; font-size: 32px; opacity: 0.08; animation: drift 8s ease-in-out infinite; color: #2d3436; }
+@keyframes drift { 0%, 100% { transform: translateY(0) rotate(0deg); } 33% { transform: translateY(-14px) rotate(5deg); } 66% { transform: translateY(10px) rotate(-4deg); } }
+.fl:nth-child(1) { top: 8%; left: 12%; animation-delay: 0s; } .fl:nth-child(2) { top: 15%; right: 20%; animation-delay: 1s; }
+.fl:nth-child(3) { top: 45%; left: 5%; animation-delay: 2s; } .fl:nth-child(4) { bottom: 25%; right: 10%; animation-delay: 1.5s; }
+.fl:nth-child(5) { bottom: 10%; left: 30%; animation-delay: 0.5s; } .fl:nth-child(6) { top: 70%; right: 28%; animation-delay: 3s; }
+.fl:nth-child(7) { top: 30%; left: 22%; animation-delay: 2.5s; } .fl:nth-child(8) { bottom: 40%; right: 3%; animation-delay: 1.8s; }
+
+.hero { position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center; padding: 44px 20px 40px; }
+.logo-wrap { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; animation: pop-in 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+@keyframes pop-in { from { transform: scale(0.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.logo-letter { font-family: 'Fredoka One', cursive; font-size: 64px; display: inline-block; animation: letter-bounce 3s ease-in-out infinite; }
+@keyframes letter-bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+.logo-letter:nth-child(1) { color: #FF6B6B; } .logo-letter:nth-child(2) { color: #FF8E53; animation-delay: 0.1s;}
+.logo-letter:nth-child(3) { color: #FFE66D; animation-delay: 0.2s;} .logo-letter:nth-child(4) { color: #55EFC4; animation-delay: 0.3s;}
+.logo-letter:nth-child(5) { color: #4ECDC4; animation-delay: 0.4s;} .logo-letter:nth-child(6) { color: #A29BFE; animation-delay: 0.5s;}
+.logo-star { font-size: 36px; animation: spin-star 4s linear infinite; margin-left: 6px; }
+@keyframes spin-star { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+.tagline { font-size: 17px; font-weight: 700; color: #6c5ce7; letter-spacing: 0.5px; margin-bottom: 30px; animation: fade-up 0.8s 0.4s ease both; }
+@keyframes fade-up { from { transform: translateY(16px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+.game-preview { background: white; border-radius: 28px; padding: 24px 26px; width: 100%; max-width: 360px; box-shadow: 0 8px 40px rgba(0,0,0,0.10); animation: fade-up 0.8s 0.6s ease both; margin-bottom: 24px; text-align: center; }
+.preview-label { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #b2bec3; margin-bottom: 16px; }
+.image-box { background: linear-gradient(135deg, #FFECD2 0%, #FCB69F 100%); border-radius: 18px; height: 120px; display: flex; align-items: center; justify-content: center; margin-bottom: 18px; font-size: 72px; }
+.word-slots { display: flex; justify-content: center; gap: 10px; margin-bottom: 16px; }
+.slot { width: 44px; height: 48px; border-radius: 12px; border: 2.5px dashed #dfe6e9; display: flex; align-items: center; justify-content: center; font-family: 'Fredoka One', cursive; font-size: 24px; }
+.slot.filled { border: 2.5px solid #FF8E53; background: #FFECD2; color: #e17055; }
+.letter-choices { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+.lc { width: 40px; height: 44px; border-radius: 10px; border: 2px solid #dfe6e9; display: flex; align-items: center; justify-content: center; font-family: 'Fredoka One', cursive; font-weight: bold; background: white; }
+.lc.lc-used { opacity: 0.3; }
+
+.cta-area { animation: fade-up 0.8s 0.8s ease both; width: 100%; max-width: 360px; }
+.btn-play { width: 100%; padding: 18px; border-radius: 20px; border: none; background: linear-gradient(135deg, #FF6B6B, #FF8E53); color: white; font-family: 'Fredoka One', cursive; font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 8px 25px rgba(255,107,107,0.35); transition: transform 0.2s; }
+.btn-play:hover { transform: scale(1.05); }
