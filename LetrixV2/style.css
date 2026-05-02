@@ -45,3 +45,94 @@ body { font-family: 'Nunito', sans-serif; background: #FFF9EC; min-height: 100vh
 .cta-area { animation: fade-up 0.8s 0.8s ease both; width: 100%; max-width: 360px; }
 .btn-play { width: 100%; padding: 18px; border-radius: 20px; border: none; background: linear-gradient(135deg, #FF6B6B, #FF8E53); color: white; font-family: 'Fredoka One', cursive; font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 8px 25px rgba(255,107,107,0.35); transition: transform 0.2s; }
 .btn-play:hover { transform: scale(1.05); }
+
+/* Fundo geral */
+/* ===================== */
+/*       CRÉDITOS        */
+/* ===================== */
+
+.creditos-container {
+  max-width: 600px;
+  margin: 80px auto;
+  text-align: center;
+  background: white;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  position: relative;
+  z-index: 10;
+}
+
+/* Título principal */
+.creditos-container h1 {
+  margin-bottom: 20px;
+  font-size: 32px;
+}
+
+/* Subtítulos */
+.creditos-container h2 {
+  margin-top: 20px;
+  color: #FF6B6B;
+}
+
+/* Textos */
+.creditos-container p {
+  margin: 10px 0;
+  line-height: 1.6;
+  color: #333;
+}
+
+/* Botão voltar */
+.btn-voltar {
+  display: inline-block;
+  margin-top: 30px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+  color: white;
+  text-decoration: none;
+  border-radius: 12px;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+/* Hover do botão */
+.btn-voltar:hover {
+  transform: scale(1.05);
+}
+/* Botão créditos fixo no canto */
+.btn-creditos {
+    position: fixed;
+    bottom: -330px;   /* Distância do chão */
+    left: -750px;     /* Distância da parede esquerda */
+    right: auto;
+    top: auto !important;
+
+    
+    /* Tamanho e Preenchimento */
+    padding: 15px 30px;   /* Aumenta a área interna */
+    font-size: 1.1rem;    /* Deixa o texto um pouco maior */
+    min-width: 160px;     /* Garante uma largura mínima para não ficar "esmagado" */
+    
+    /* Alinhamento interno */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    /* Estilo Visual (Baseado no seu projeto) */
+    background: linear-gradient(to right, #ff7e5f, #feb47b);
+    color: white;
+    border: none;
+    border-radius: 50px; /* Deixa ele bem arredondado como o outro */
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(255, 126, 95, 0.4);
+    transition: transform 0.3s, box-shadow 0.3s;
+    z-index: 9999; /* Garante que fique acima de tudo */
+}
+
+/* Efeito ao passar o mouse */
+.btn-creditos:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(255, 126, 95, 0.6);
+}
