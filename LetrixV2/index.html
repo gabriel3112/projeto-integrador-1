@@ -10,6 +10,12 @@
 </head>
 <body>
 
+  <!-- Música de fundo -->
+  <audio id="musica-fundo" loop>
+    <source src="sons/musica-fundo.mp3" type="audio/mpeg">
+  </audio>
+  <!-- Música de fundo -->
+
   <div class="bg-bubbles">
     <div class="bubble"></div><div class="bubble"></div>
     <div class="bubble"></div><div class="bubble"></div>
@@ -48,15 +54,38 @@
       </div>
     </div>
 
-    <div class="cta-area">
-      <button class="btn-play" onclick="window.location.href='jogar.html'">
-        <span class="btn-icon">🎮</span> Jogar agora!
-      </button>
-      <button class="btn-creditos" onclick="window.location.href='creditos.html'">
-  ℹ️ Créditos
-      </button>
-    </div>
-  </div>
+   <div class="cta-area">
+  <button class="btn-play" onclick="window.location.href='jogar.html'">
+    <span class="btn-icon">🎮</span> Jogar agora!
+  </button>
 
+  <button class="btn-creditos" onclick="window.location.href='creditos.html'">
+    ℹ️ Créditos
+  </button>
+
+  <!-- Música de fundo -->
+  <button class="btn-som" onclick="toggleMusica()">
+    🔇
+  </button>
+  </div> 
+  </div>
+   <script>
+      const musica = document.getElementById("musica-fundo");
+      let tocando = false;
+
+      function toggleMusica() {
+        if (!tocando) {
+          musica.volume = 0.3;
+          musica.play();
+          tocando = true;
+          document.querySelector(".btn-som").innerText = "🔊";
+        } else {
+          musica.pause();
+          tocando = false;
+          document.querySelector(".btn-som").innerText = "🔇";
+        }
+      }
+    </script>
+  <!-- Música de fundo -->
 </body>
 </html>

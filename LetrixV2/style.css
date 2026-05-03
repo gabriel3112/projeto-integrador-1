@@ -136,3 +136,38 @@ body { font-family: 'Nunito', sans-serif; background: #FFF9EC; min-height: 100vh
     transform: scale(1.05);
     box-shadow: 0 6px 20px rgba(255, 126, 95, 0.6);
 }
+/* Botão de som (canto da tela) */
+.btn-som {
+  position: fixed;
+  bottom: -332px;
+  left: 1050px;
+
+  padding: 14px 18px;
+  border-radius: 50px;
+  border: none;
+
+  font-size: 20px;
+  font-weight: bold;
+
+  background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+  color: white;
+
+  cursor: pointer;
+  transition: 0.3s;
+
+  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+  z-index: 9999;
+
+  animation: float 2s ease-in-out infinite;
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+}
+
+/* Hover */
+.btn-som:hover {
+  transform: scale(1.1);
+  box-shadow: 0 10px 25px rgba(255, 107, 107, 0.6);
+}
