@@ -105,5 +105,4 @@ ESCOVA|🪥|Objeto
 SOL|☀️|Estrelas
 LUA|🌑|Estrelas
 ESTRELA|⭐|Estrelas
-FOGO|🔥|Estrelas
-`;
+FOGO|🔥|Estrelas`;
