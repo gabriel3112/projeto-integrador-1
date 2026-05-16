@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Letrix - Área do Profissional</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .dashboard-container {
+      max-width: 800px; margin: 40px auto; padding: 30px;
+      background: white; border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      position: relative; z-index: 10;
+    }
+    h1 { color: #6c5ce7; font-family: 'Fredoka One', cursive; text-align: center;}
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { padding: 12px; border: 1px solid #e0e0e0; text-align: center; }
+    th { background-color: #f1f2f6; color: #2d3436; }
+    .btn-print {
+      display: block; width: 200px; margin: 20px auto; padding: 10px;
+      background: #00b894; color: white; text-align: center;
+      border: none; border-radius: 10px; font-weight: bold; cursor: pointer;
+    }
+    .btn-print:hover { background: #55EFC4; }
+    @media print {
+      body { background: white; }
+      .bg-bubbles, .btn-print, .btn-creditos { display: none !important; }
+      .dashboard-container { box-shadow: none; margin: 0; padding: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-bubbles">
+    <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
+  </div>
+
+  <div class="dashboard-container">
+    <h1>📊 Relatório Psicopedagógico</h1>
+    <p style="text-align: center;">Acompanhamento de desempenho cognitivo e atenção.</p>
+    
+    <table>
+      <thead>
+        <tr>
+          <th>Data/Hora</th>
+          <th>Jogo</th>
+          <th>Fase/Palavra</th>
+          <th>Erros Cometidos</th>
+          <th>Tempo (s)</th>
+        </tr>
+      </thead>
+      <tbody id="tabela-resultados">
+        </tbody>
+    </table>
+
+    <button class="btn-print" onclick="window.print()">🖨️ Imprimir PDF</button>
+    <button class="btn-creditos" onclick="window.location.href='index.html'" style="display:block; margin: 0 auto; background: #FF6B6B; width: 200px;">Voltar ao Menu</button>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const historico = JSON.parse(localStorage.getItem('letrix_historico')) || [];
+      const tbody = document.getElementById('tabela-resultados');
+
+      if (historico.length === 0) {
+        tbody.innerHTML = "<tr><td colspan='5'>Nenhum registo efetuado. Jogue uma partida!</td></tr>";
+      } else {
+        historico.reverse().forEach(registro => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${registro.data}</td>
+            <td><strong>${registro.jogo}</strong></td>
+            <td>${registro.fase}</td>
+            <td style="color: ${registro.erros > 0 ? '#d63031' : '#00b894'}; font-weight: 800;">${registro.erros}</td>
+            <td>${registro.tempo}s</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+    });
+  </script>
+</body>
+</html>

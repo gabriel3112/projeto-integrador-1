@@ -28,44 +28,33 @@
   <div class="progress-area">
     <div class="progress-info">
       <span id="progress-text">Palavra 1</span>
-      <span id="progress-pct">0%</span>
+      <span class="badge" id="category-badge">...</span>
     </div>
-    <div class="progress-bar-bg">
-      <div class="progress-bar-fill" id="progress-fill" style="width: 0%"></div>
-    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    <div class="timer-bar" id="timer-bar"></div>
   </div>
 
-  <div class="score-strip">
-    <div class="score-pill score-pts"><span class="icon">⭐</span><span id="score-val">0</span> pts</div>
-    <div class="score-pill score-streak"><span class="icon">🔥</span><span id="streak-val">0</span> seguidas</div>
-    <div class="score-pill score-timer"><span class="icon">⏱</span><span id="timer-val">30</span>s</div>
-  </div>
-
-  <div class="game-area">
-    <div class="image-card">
-      <div class="image-frame" id="image-frame">
-        <span id="word-emoji" style="line-height:1; font-size:80px;">🦁</span>
-        <button class="hint-btn" id="hint-btn" title="Dica (-20 pts)">💡</button>
-      </div>
-      <span class="category-badge" id="category-badge">Animais</span>
-    </div>
-
+  <div class="game-board">
+    <div class="current-emoji" id="current-emoji"></div>
     <div class="word-slots" id="word-slots"></div>
-    <div class="letter-grid" id="letter-grid"></div>
+    <div class="letter-choices" id="letter-choices"></div>
+  </div>
 
-    <div class="action-row">
-      <button class="btn-clear" id="btn-clear">🔄 Apagar</button>
-      <button class="btn-confirm" id="btn-confirm" disabled>✓ Confirmar</button>
+  <div class="bottom-bar">
+    <div class="stats">
+      <span>🏆 <strong id="score-val">0</strong></span>
+      <span>🔥 <strong id="streak-val">0</strong></span>
     </div>
+    <button class="btn-confirm" id="btn-confirm">✓ Confirmar</button>
   </div>
 
   <div class="overlay" id="overlay">
-    <div class="overlay-card" id="overlay-card">
-      <div class="overlay-emoji" id="ov-emoji">🎉</div>
-      <div class="overlay-title" id="ov-title">Arrasou!</div>
-      <div class="overlay-sub" id="ov-sub">A palavra era LEÃO</div>
-      <div class="overlay-pts" id="ov-pts">+100 pts</div>
-      <button class="btn-next" id="btn-next">Próxima ➜</button>
+    <div class="overlay-card">
+      <div class="overlay-emoji" id="ov-emoji"></div>
+      <div class="overlay-title" id="ov-title"></div>
+      <div class="overlay-sub" id="ov-sub"></div>
+      <div class="overlay-pts" id="ov-pts"></div>
+      <button class="btn-next" id="btn-next">Próxima</button>
     </div>
   </div>
 
@@ -76,165 +65,131 @@
     const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     let currentIdx = 0, score = 0, streak = 0, lives = 3;
+    let filledSlots = [];
     let timerSec = 30, timerInterval = null;
-    let filledSlots = [], usedLetterEls = [], hintUsed = false;
+    let errosNaPalavra = 0;
+    let tempoInicioPalavra = Date.now();
 
-    // Inicia e carrega as palavras do "txt"
-    function initWords() {
-      const lines = CONTEUDO_TXT.split('\n').filter(l => l.trim() !== '');
-      WORDS = lines.map(line => {
-        const parts = line.split('|');
-        const word = parts[0].trim().toUpperCase();
-        return {
-          word: word,
-          emoji: parts[1] ? parts[1].trim() : '❓',
-          badge: parts[2] ? parts[2].trim() : 'Geral',
-          color: COLORS[Math.floor(Math.random() * COLORS.length)],
-          extra: generateExtraLetters(word, 3)
-        };
+    // WEB AUDIO API PARA EFEITOS SONOROS
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function tocarAcerto() {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+      osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+    }
+
+    function tocarErro() {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
+      osc.start(); osc.stop(audioCtx.currentTime + 0.2);
+    }
+
+    // GRAVAR DADOS PARA O DASHBOARD
+    function salvarEstatistica(jogo, fase, erros, tempoGasto) {
+      let historico = JSON.parse(localStorage.getItem('letrix_historico')) || [];
+      historico.push({
+        data: new Date().toLocaleString('pt-BR'),
+        jogo: jogo, fase: fase, erros: erros, tempo: tempoGasto
       });
-      WORDS = shuffle(WORDS);
+      localStorage.setItem('letrix_historico', JSON.stringify(historico));
+    }
+
+    function initWords() {
+      if (typeof CONTEUDO_TXT !== 'undefined' && CONTEUDO_TXT.trim()) {
+        const linhas = CONTEUDO_TXT.trim().split('\n');
+        const todas = linhas.map(l => {
+          const p = l.trim().split('|');
+          return p.length >= 3 ? { word: p[0].toUpperCase(), emoji: p[1], category: p[2] } : null;
+        }).filter(i => i !== null);
+        todas.sort(() => Math.random() - 0.5);
+        WORDS = todas.slice(0, 10);
+      } else {
+        WORDS = [{ word: "BOLO", emoji: "🎂", category: "Comidas" }];
+      }
       loadWord();
     }
 
-    function generateExtraLetters(word, count) {
-      let extras = [];
-      while(extras.length < count) {
-        const l = ALPHABET[Math.floor(Math.random() * ALPHABET.length)];
-        if(!word.includes(l) && !extras.includes(l)) extras.push(l);
-      }
-      return extras;
-    }
-
-    function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
-
-    function renderLives() {
-      const el = document.getElementById('lives-display');
-      el.innerHTML = '';
-      for (let i = 0; i < 3; i++) {
-        const h = document.createElement('span');
-        h.className = 'heart' + (i >= lives ? ' lost' : '');
-        h.textContent = '❤️';
-        el.appendChild(h);
-      }
-    }
-
-    function updateProgress() {
-      const pct = Math.round(((currentIdx) / WORDS.length) * 100);
-      document.getElementById('progress-text').textContent = `Palavra ${currentIdx + 1} de ${WORDS.length}`;
-      document.getElementById('progress-pct').textContent = pct + '%';
-      document.getElementById('progress-fill').style.width = pct + '%';
-    }
-
-    function startTimer() {
-      clearInterval(timerInterval);
-      timerSec = 30; hintUsed = false;
-      const el = document.getElementById('timer-val');
-      el.classList.remove('timer-urgent');
-      el.textContent = timerSec;
-      timerInterval = setInterval(() => {
-        timerSec--; el.textContent = timerSec;
-        if (timerSec <= 10) el.classList.add('timer-urgent');
-        if (timerSec <= 0) timeUp();
-      }, 1000);
-    }
-
     function loadWord() {
-      const data = WORDS[currentIdx];
-      filledSlots = Array(data.word.length).fill(null);
-      usedLetterEls = [];
+      if (WORDS.length === 0) return;
+      const current = WORDS[currentIdx];
+      
+      document.getElementById('progress-text').textContent = `Palavra ${currentIdx + 1} de ${WORDS.length}`;
+      document.getElementById('current-emoji').textContent = current.emoji;
+      document.getElementById('category-badge').textContent = current.category;
+      document.getElementById('progress-fill').style.width = (((currentIdx + 1) / WORDS.length) * 100) + '%';
 
-      document.getElementById('word-emoji').textContent = data.emoji;
-      document.getElementById('image-frame').style.background = data.color + '22';
-      const badge = document.getElementById('category-badge');
-      badge.textContent = data.badge;
-      badge.style.background = data.color + '22';
-      badge.style.color = data.color;
-      badge.style.border = '2px solid ' + data.color + '66';
+      errosNaPalavra = 0;
+      tempoInicioPalavra = Date.now();
+      filledSlots = Array(current.word.length).fill(null).map(() => ({ letter: "" }));
 
-      const slotsEl = document.getElementById('word-slots');
-      slotsEl.innerHTML = '';
-      for (let i = 0; i < data.word.length; i++) {
-        const s = document.createElement('div');
-        s.className = 'slot';
-        s.addEventListener('click', () => removeFromSlot(i));
-        slotsEl.appendChild(s);
-      }
-
-      const letters = shuffle([...data.word.split(''), ...data.extra]);
-      const grid = document.getElementById('letter-grid');
-      grid.innerHTML = '';
-      letters.forEach((letter, i) => {
-        const btn = document.createElement('div');
-        btn.className = 'lc'; btn.textContent = letter;
-        const color = COLORS[i % COLORS.length];
-        btn.style.background = color + '18';
-        btn.style.borderColor = color;
-        btn.style.color = color;
-        btn.dataset.letter = letter;
-        btn.addEventListener('click', () => pickLetter(btn));
-        grid.appendChild(btn);
+      const slotsContainer = document.getElementById('word-slots');
+      slotsContainer.innerHTML = '';
+      filledSlots.forEach((slot, index) => {
+        const div = document.createElement('div');
+        div.className = 'ws';
+        div.addEventListener('click', () => removerLetra(index));
+        slotsContainer.appendChild(div);
       });
 
-      document.getElementById('btn-confirm').disabled = true;
-      startTimer(); updateProgress(); renderLives();
-    }
-
-    function pickLetter(btn) {
-      if (btn.classList.contains('used')) return;
-      const nextEmpty = filledSlots.findIndex(v => v === null);
-      if (nextEmpty === -1) return;
-
-      filledSlots[nextEmpty] = { letter: btn.dataset.letter, el: btn };
-      btn.classList.add('used');
-
-      const slotEls = document.getElementById('word-slots').children;
-      const slotEl = slotEls[nextEmpty];
-      slotEl.textContent = btn.dataset.letter;
-      slotEl.className = 'slot filled';
-      slotEl.style.background = btn.style.background;
-      slotEl.style.borderColor = btn.style.borderColor;
-      slotEl.style.color = btn.style.color;
-
-      document.getElementById('btn-confirm').disabled = filledSlots.includes(null);
-    }
-
-    function removeFromSlot(idx) {
-      if (!filledSlots[idx]) return;
-      filledSlots[idx].el.classList.remove('used');
-      filledSlots[idx] = null;
-
-      const slotEl = document.getElementById('word-slots').children[idx];
-      slotEl.textContent = '';
-      slotEl.className = 'slot';
-      slotEl.style.background = 'white';
-      slotEl.style.borderColor = '#d0d0d0';
-      document.getElementById('btn-confirm').disabled = true;
-    }
-
-    document.getElementById('btn-clear').addEventListener('click', () => {
-      filledSlots.forEach((_, i) => removeFromSlot(i));
-    });
-
-    document.getElementById('hint-btn').addEventListener('click', () => {
-      if (hintUsed) return;
-      hintUsed = true;
-      score = Math.max(0, score - 20);
-      document.getElementById('score-val').textContent = score;
-      
-      const currentWord = WORDS[currentIdx].word;
-      const nextEmpty = filledSlots.findIndex(v => v === null);
-      if (nextEmpty !== -1) {
-        const correctLetter = currentWord[nextEmpty];
-        const btns = Array.from(document.getElementById('letter-grid').children);
-        const correctBtn = btns.find(b => b.dataset.letter === correctLetter && !b.classList.contains('used'));
-        if(correctBtn) pickLetter(correctBtn);
+      const letrasOpcoes = current.word.split('');
+      while (letrasOpcoes.length < Math.max(current.word.length + 3, 8)) {
+        const rand = ALPHABET[Math.floor(Math.random() * ALPHABET.length)];
+        if (!letrasOpcoes.includes(rand)) letrasOpcoes.push(rand);
       }
-    });
+      letrasOpcoes.sort(() => Math.random() - 0.5);
+
+      const choicesContainer = document.getElementById('letter-choices');
+      choicesContainer.innerHTML = '';
+      letrasOpcoes.forEach(letra => {
+        const div = document.createElement('div');
+        div.className = 'lc'; div.textContent = letra;
+        div.style.backgroundColor = COLORS[Math.floor(Math.random() * COLORS.length)];
+        div.addEventListener('click', () => inserirLetra(letra, div));
+        choicesContainer.appendChild(div);
+      });
+
+      resetTimer(); renderLives();
+    }
+
+    function inserirLetra(letra, el) {
+      const idx = filledSlots.findIndex(s => s.letter === "");
+      if (idx === -1) return;
+      el.classList.add('lc-used'); el.style.pointerEvents = 'none';
+      filledSlots[idx] = { letter: letra, originElement: el };
+      document.getElementById('word-slots').children[idx].textContent = letra;
+    }
+
+    function removerLetra(idx) {
+      if (filledSlots[idx].letter === "") return;
+      const origin = filledSlots[idx].originElement;
+      if (origin) { origin.classList.remove('lc-used'); origin.style.pointerEvents = 'auto'; }
+      filledSlots[idx] = { letter: "" };
+      document.getElementById('word-slots').children[idx].textContent = "";
+    }
 
     document.getElementById('btn-confirm').addEventListener('click', () => {
       const currentWord = WORDS[currentIdx].word;
       const userWord = filledSlots.map(s => s.letter).join('');
+      const slots = document.getElementById('word-slots').children;
+
+      if (userWord.length < currentWord.length) {
+        Array.from(slots).forEach(el => { el.classList.add('wrong'); setTimeout(() => el.classList.remove('wrong'), 400); });
+        return;
+      }
 
       if (userWord === currentWord) {
         clearInterval(timerInterval);
@@ -243,45 +198,71 @@
         document.getElementById('score-val').textContent = score;
         document.getElementById('streak-val').textContent = streak;
 
+        tocarAcerto();
+        const tempoGasto = ((Date.now() - tempoInicioPalavra) / 1000).toFixed(1);
+        salvarEstatistica("Soletração", currentWord, errosNaPalavra, tempoGasto);
+        
         showOverlay(WORDS[currentIdx].emoji, "Arrasou!", "A palavra era " + currentWord, "+" + earned + " pts", true);
         launchConfetti();
       } else {
         streak = 0; document.getElementById('streak-val').textContent = streak;
         lives--; renderLives();
-        const slots = document.getElementById('word-slots').children;
-        Array.from(slots).forEach(el => {
-          el.classList.add('wrong');
-          setTimeout(() => el.classList.remove('wrong'), 400);
-        });
-        if (lives <= 0) gameOver();
+        tocarErro(); errosNaPalavra++;
+
+        Array.from(slots).forEach(el => { el.classList.add('wrong'); setTimeout(() => el.classList.remove('wrong'), 400); });
+        
+        if (lives <= 0) {
+          clearInterval(timerInterval);
+          salvarEstatistica("Soletração", currentWord, errosNaPalavra, ((Date.now() - tempoInicioPalavra) / 1000).toFixed(1));
+          gameOver();
+        }
       }
     });
 
-    function timeUp() {
-      lives--; renderLives();
-      if (lives <= 0) gameOver();
-      else { alert("Tempo esgotado! Uma vida perdida."); startTimer(); }
-    }
-
-    function gameOver() {
+    function resetTimer() {
       clearInterval(timerInterval);
-      showOverlay("😢", "Fim de Jogo!", "Você ficou sem vidas.", "Pontos: " + score, false);
+      timerSec = 30;
+      const timerBar = document.getElementById('timer-bar');
+      timerBar.style.width = '100%'; timerBar.style.backgroundColor = '#00b894';
+
+      timerInterval = setInterval(() => {
+        timerSec--;
+        timerBar.style.width = (timerSec / 30) * 100 + '%';
+        if (timerSec <= 10) timerBar.style.backgroundColor = '#FF6B6B';
+        if (timerSec <= 0) {
+          clearInterval(timerInterval); tocarErro(); errosNaPalavra++; lives--; renderLives();
+          if (lives <= 0) {
+            salvarEstatistica("Soletração", WORDS[currentIdx].word, errosNaPalavra, ((Date.now() - tempoInicioPalavra) / 1000).toFixed(1));
+            gameOver();
+          } else {
+            showOverlay("⏰", "Tempo Esgotado!", "Vamos para a próxima.", "0 pts", true);
+          }
+        }
+      }, 1000);
     }
 
-    function showOverlay(emoji, title, sub, ptsText, isWin) {
+    function renderLives() {
+      const display = document.getElementById('lives-display');
+      display.innerHTML = '';
+      for (let i = 0; i < 3; i++) {
+        const span = document.createElement('span');
+        span.className = i < lives ? 'heart' : 'heart empty';
+        span.textContent = '❤️';
+        display.appendChild(span);
+      }
+    }
+
+    function showOverlay(emoji, title, subText, ptsText, isWin) {
       document.getElementById('ov-emoji').textContent = emoji;
       document.getElementById('ov-title').textContent = title;
-      document.getElementById('ov-sub').textContent = sub;
-      
+      document.getElementById('ov-sub').textContent = subText;
       const ptsEl = document.getElementById('ov-pts');
-      ptsEl.textContent = ptsText;
-      ptsEl.className = 'overlay-pts ' + (isWin ? 'ok' : 'fail');
-      
+      ptsEl.textContent = ptsText; ptsEl.className = 'overlay-pts ' + (isWin ? 'ok' : 'fail');
       const btn = document.getElementById('btn-next');
       btn.className = 'btn-next ' + (isWin ? 'ok' : 'fail');
       
-      if(!isWin) {
-        btn.textContent = '🔄 Jogar de novo';
+      if (!isWin) {
+        btn.textContent = '🔄 Voltar ao Menu';
         btn.onclick = () => window.location.href = 'index.html';
       } else {
         btn.textContent = 'Próxima ➜';
@@ -289,29 +270,27 @@
           document.getElementById('overlay').classList.remove('show');
           currentIdx++;
           if (currentIdx >= WORDS.length) {
-            showOverlay("🏆", "Zerou!", "Você completou todas as palavras!", "Total: " + score, false);
+            showOverlay("🏆", "Zerou!", "Você é incrível!", "Total: " + score, false);
           } else loadWord();
         };
       }
       document.getElementById('overlay').classList.add('show');
     }
 
+    function gameOver() { showOverlay("😢", "Fim de Jogo!", "Acabaram as vidas.", "Total: " + score, false); }
+
     function launchConfetti() {
-      const wrap = document.getElementById('confetti-wrap');
-      wrap.innerHTML = '';
+      const wrap = document.getElementById('confetti-wrap'); wrap.innerHTML = '';
       for (let i = 0; i < 40; i++) {
-        const c = document.createElement('div');
-        c.className = 'conf';
+        const c = document.createElement('div'); c.className = 'conf';
         c.style.left = Math.random() * 100 + '%';
         c.style.background = COLORS[Math.floor(Math.random() * COLORS.length)];
-        c.style.width = (6 + Math.random() * 8) + 'px';
-        c.style.height = (10 + Math.random() * 10) + 'px';
-        c.style.animationDelay = (Math.random() * 0.5) + 's';
-        wrap.appendChild(c);
+        c.style.width = (6 + Math.random() * 8) + 'px'; c.style.height = (10 + Math.random() * 10) + 'px';
+        c.style.animationDelay = (Math.random() * 0.5) + 's'; wrap.appendChild(c);
       }
     }
 
-    initWords();
+    window.addEventListener('DOMContentLoaded', initWords);
   </script>
 </body>
 </html>

@@ -1,0 +1,160 @@
+/* ==========================================================================
+   RESET & CONFIGURAÇÕES BASE (Mantendo o estilo Letrix)
+   ========================================================================== */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body { 
+  font-family: 'Nunito', sans-serif; 
+  background: #FFF9EC; 
+  min-height: 100vh; 
+  overflow-x: hidden; 
+  position: relative; 
+  padding-bottom: 100px; 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+}
+
+/* Bolhas de Fundo Animadas */
+.bg-bubbles { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+.bubble { position: absolute; border-radius: 50%; opacity: 0.10; animation: float-bubble 6s ease-in-out infinite; }
+@keyframes float-bubble { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-16px) scale(1.04); } }
+.bubble:nth-child(1) { width: 120px; height: 120px; background: #FF6B6B; top: 2%; left: 2%; }
+.bubble:nth-child(2) { width: 80px; height: 80px; background: #A29BFE; top: 10%; right: 4%; }
+.bubble:nth-child(3) { width: 60px; height: 60px; background: #55EFC4; bottom: 12%; left: 6%; }
+.bubble:nth-child(4) { width: 90px; height: 90px; background: #FDCB6E; bottom: 6%; right: 8%; }
+
+/* ==========================================================================
+   CABEÇALHO
+   ========================================================================== */
+.header { 
+  width: 100%; max-width: 600px; 
+  display: flex; justify-content: space-between; align-items: center; 
+  padding: 20px; position: relative; z-index: 10; 
+}
+
+.btn-back { 
+  background: white; border: 3px solid #e0e0e0; border-radius: 50%; 
+  width: 45px; height: 45px; font-size: 20px; font-weight: bold; 
+  color: #2d3436; cursor: pointer; box-shadow: 0 4px 0 #e0e0e0; 
+  transition: 0.1s;
+}
+.btn-back:active { transform: translateY(4px); box-shadow: none; }
+
+.logo-mini { font-family: 'Fredoka One', cursive; font-size: 24px; color: #6c5ce7; display: flex; gap: 4px; }
+.logo-mini span:nth-child(even) { color: #00b894; }
+
+.stats-top { font-size: 18px; color: #636e72; font-weight: bold; }
+.stats-top strong { color: #2d3436; font-size: 22px; }
+
+/* ==========================================================================
+   ÁREA DO JOGO DA MEMÓRIA
+   ========================================================================== */
+.game-board {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; 
+  width: 100%; max-width: 500px; padding: 10px; position: relative; z-index: 10;
+}
+
+.memory-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* Grid 4x4 */
+  gap: 12px;
+  width: 100%;
+}
+
+/* ==========================================================================
+   CARTAS DO JOGO
+   ========================================================================== */
+.memory-card {
+  aspect-ratio: 1 / 1;
+  perspective: 1000px; /* Para o efeito 3D */
+  cursor: pointer;
+}
+
+.card-inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transition: transform 0.5s cubic-bezier(0.4, 0.2, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+.memory-card.flip .card-inner {
+  transform: rotateY(180deg);
+}
+
+.card-front, .card-back {
+  position: absolute; width: 100%; height: 100%;
+  backface-visibility: hidden;
+  border-radius: 16px;
+  display: flex; justify-content: center; align-items: center;
+  font-family: 'Fredoka One', cursive;
+}
+
+/* Costas da carta (O ponto de interrogação inicial) */
+.card-front {
+  background: #74B9FF; border: 4px solid #0984e3;
+  box-shadow: 0 6px 0 #0984e3;
+  color: white; font-size: 36px;
+}
+
+/* Frente da carta (Emoji) */
+.card-back {
+  background: white; 
+  transform: rotateY(180deg);
+  font-size: 40px;
+  /* As bordas e sombras são definidas dinamicamente no JS */
+}
+
+.memory-card.pop { animation: popIn 0.3s ease-out; }
+
+/* ==========================================================================
+   BARRA INFERIOR FIXA
+   ========================================================================== */
+.bottom-bar { 
+  position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 20px; 
+  display: flex; justify-content: center; align-items: center; 
+  box-shadow: 0 -5px 20px rgba(0,0,0,0.05); z-index: 20; 
+  border-top-left-radius: 20px; border-top-right-radius: 20px; 
+}
+
+.btn-confirm { 
+  background: #00b894; color: white; border: none; padding: 15px 30px; 
+  border-radius: 25px; font-family: 'Fredoka One', cursive; font-size: 20px; 
+  cursor: pointer; box-shadow: 0 6px 0 #0f9b74; transition: 0.1s; 
+}
+.btn-confirm:active { transform: translateY(6px); box-shadow: none; }
+.btn-restart { background: #FF6B6B; box-shadow: 0 6px 0 #d63031; }
+
+/* ==========================================================================
+   OVERLAY & CONFETES (Idêntico ao jogar.css)
+   ========================================================================== */
+.overlay { 
+  position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); 
+  display: flex; align-items: center; justify-content: center; z-index: 100; 
+  opacity: 0; pointer-events: none; transition: 0.3s; 
+}
+.overlay.show { opacity: 1; pointer-events: auto; }
+.overlay-card { 
+  background: white; border-radius: 30px; padding: 30px 20px; width: 90%; 
+  max-width: 320px; text-align: center; transform: translateY(30px); transition: 0.3s; 
+}
+.overlay.show .overlay-card { transform: translateY(0); }
+.overlay-emoji { font-size: 64px; margin-bottom: 10px; }
+.overlay-title { font-family: 'Fredoka One', cursive; font-size: 32px; color: #2d3436; margin-bottom: 6px; }
+.overlay-sub { font-size: 16px; color: #636e72; margin-bottom: 20px; font-weight: 700; }
+.overlay-pts { display: inline-block; padding: 6px 16px; border-radius: 20px; font-weight: 800; font-size: 18px; margin-bottom: 24px; }
+.overlay-pts.ok { background: #D5F5E3; color: #00b894; } 
+
+.btn-next { 
+  background: #6c5ce7; color: white; border: none; padding: 14px 30px; border-radius: 20px; 
+  font-family: 'Fredoka One', cursive; font-size: 18px; cursor: pointer; width: 100%; 
+  box-shadow: 0 6px 0 #4834d4; transition: 0.1s;
+}
+.btn-next:active { transform: translateY(6px); box-shadow: none; }
+
+.confetti-wrap { position: fixed; inset: 0; pointer-events: none; z-index: 50; overflow: hidden; }
+.conf { position: absolute; top: -20px; animation: fall 3s linear forwards; }
+
+@keyframes fall { to { transform: translateY(100vh) rotate(720deg); } }
+@keyframes popIn { 0% { transform: scale(0.8); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }

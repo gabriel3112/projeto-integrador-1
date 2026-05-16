@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Letrix – Memória</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="memoria.css">
+</head>
+<body>
+
+  <div class="bg-bubbles">
+    <div class="bubble"></div><div class="bubble"></div>
+    <div class="bubble"></div><div class="bubble"></div>
+  </div>
+
+  <div class="confetti-wrap" id="confetti-wrap"></div>
+
+  <div class="header">
+    <button class="btn-back" onclick="window.location.href='index.html'">←</button>
+    <div class="logo-mini">
+      <span>M</span><span>E</span><span>M</span><span>Ó</span><span>R</span><span>I</span><span>A</span>
+    </div>
+    <div class="stats-top">
+      <span>Tentativas: <strong id="moves-val">0</strong></span>
+    </div>
+  </div>
+
+  <div class="game-board">
+    <div class="memory-grid" id="memory-grid">
+      </div>
+  </div>
+
+  <div class="bottom-bar">
+    <button class="btn-confirm btn-restart" id="btn-restart" onclick="iniciarJogo()">
+      🔄 Reiniciar
+    </button>
+  </div>
+
+  <div class="overlay" id="overlay">
+    <div class="overlay-card">
+      <div class="overlay-emoji" id="ov-emoji">🏆</div>
+      <div class="overlay-title" id="ov-title">Parabéns!</div>
+      <div class="overlay-sub" id="ov-sub">Você encontrou todos os pares.</div>
+      <div class="overlay-pts" id="ov-pts">0 Tentativas</div>
+      <button class="btn-next ok" id="btn-next" onclick="voltarMenu()">🏠 Voltar ao Menu</button>
+    </div>
+  </div>
+
+  <script>
+    const COLORS = ['#FF6B6B','#74B9FF','#55EFC4','#A29BFE','#FDCB6E','#FD79A8','#FF8E53','#00b894'];
+    const emojis = ['🐶', '🐱', '🦊', '🐻', '🐼', '🐨', '🐯', '🐸'];
+    
+    let cartas = [];
+    let primeiraCarta = null;
+    let segundaCarta = null;
+    let trancarTabuleiro = false;
+    let tentativas = 0;
+    let paresEncontrados = 0;
+
+    // WEB AUDIO API PARA EFEITOS SONOROS (Mesmo do seu código)
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function tocarAcerto() {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+      osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+    }
+
+    function tocarErro() {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
+      osc.start(); osc.stop(audioCtx.currentTime + 0.2);
+    }
+
+    function iniciarJogo() {
+      const grid = document.getElementById('memory-grid');
+      grid.innerHTML = '';
+      tentativas = 0;
+      paresEncontrados = 0;
+      primeiraCarta = null;
+      segundaCarta = null;
+      trancarTabuleiro = false;
+      document.getElementById('moves-val').textContent = tentativas;
+      document.getElementById('overlay').classList.remove('show');
+      document.getElementById('confetti-wrap').innerHTML = '';
+
+      // Duplica e embaralha os emojis
+      cartas = [...emojis, ...emojis];
+      cartas.sort(() => Math.random() - 0.5);
+
+      cartas.forEach((emoji) => {
+        const card = document.createElement('div');
+        card.classList.add('memory-card');
+        card.dataset.emoji = emoji;
+
+        // Cor aleatória para as costas da carta combinada com seu estilo
+        const randomColor = COLORS[Math.floor(Math.random() * COLORS.length)];
+
+        card.innerHTML = `
+          <div class="card-inner">
+            <div class="card-front">?</div>
+            <div class="card-back" style="border-color: ${randomColor}; box-shadow: 0 6px 0 ${randomColor};">${emoji}</div>
+          </div>
+        `;
+
+        card.addEventListener('click', virarCarta);
+        grid.appendChild(card);
+      });
+    }
+
+    function virarCarta() {
+      if (trancarTabuleiro) return;
+      if (this === primeiraCarta) return;
+
+      this.classList.add('flip');
+
+      if (!primeiraCarta) {
+        primeiraCarta = this;
+        return;
+      }
+
+      segundaCarta = this;
+      verificarCombinacao();
+    }
+
+    function verificarCombinacao() {
+      tentativas++;
+      document.getElementById('moves-val').textContent = tentativas;
+
+      let combinou = primeiraCarta.dataset.emoji === segundaCarta.dataset.emoji;
+
+      if (combinou) {
+        desabilitarCartas();
+      } else {
+        desvirarCartas();
+      }
+    }
+
+    function desabilitarCartas() {
+      tocarAcerto();
+      primeiraCarta.removeEventListener('click', virarCarta);
+      segundaCarta.removeEventListener('click', virarCarta);
+      
+      // Adiciona uma animação de "pop" nas cartas certas
+      primeiraCarta.classList.add('pop');
+      segundaCarta.classList.add('pop');
+
+      resetarTabuleiro();
+      paresEncontrados++;
+
+      if (paresEncontrados === emojis.length) {
+        setTimeout(fimDeJogo, 500);
+      }
+    }
+
+    function desvirarCartas() {
+      trancarTabuleiro = true;
+      setTimeout(() => {
+        tocarErro();
+        primeiraCarta.classList.remove('flip');
+        segundaCarta.classList.remove('flip');
+        resetarTabuleiro();
+      }, 1000);
+    }
+
+    function resetarTabuleiro() {
+      [primeiraCarta, segundaCarta, trancarTabuleiro] = [null, null, false];
+    }
+
+    function fimDeJogo() {
+      tocarAcerto();
+      document.getElementById('ov-pts').textContent = tentativas + " Tentativas";
+      document.getElementById('ov-pts').className = 'overlay-pts ok';
+      document.getElementById('overlay').classList.add('show');
+      launchConfetti();
+    }
+
+    function voltarMenu() {
+      window.location.href = 'index.html';
+    }
+
+    function launchConfetti() {
+      const wrap = document.getElementById('confetti-wrap'); wrap.innerHTML = '';
+      for (let i = 0; i < 40; i++) {
+        const c = document.createElement('div'); c.className = 'conf';
+        c.style.left = Math.random() * 100 + '%';
+        c.style.background = COLORS[Math.floor(Math.random() * COLORS.length)];
+        c.style.width = (6 + Math.random() * 8) + 'px'; c.style.height = (10 + Math.random() * 10) + 'px';
+        c.style.animationDelay = (Math.random() * 0.5) + 's'; wrap.appendChild(c);
+      }
+    }
+
+    // Inicializa o jogo ao carregar a página
+    window.addEventListener('DOMContentLoaded', iniciarJogo);
+  </script>
+</body>
+</html>

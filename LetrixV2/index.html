@@ -10,11 +10,9 @@
 </head>
 <body>
 
-  <!-- Música de fundo -->
   <audio id="musica-fundo" loop>
     <source src="The_Toybox_Sprint.mp3" type="audio/mp3">
   </audio>
-  <!-- Música de fundo -->
 
   <div class="bg-bubbles">
     <div class="bubble"></div><div class="bubble"></div>
@@ -23,77 +21,57 @@
   </div>
 
   <div class="floating-letters">
-    <span class="fl">A</span><span class="fl">B</span><span class="fl">C</span><span class="fl">D</span>
-    <span class="fl">E</span><span class="fl">Z</span><span class="fl">M</span><span class="fl">P</span>
+    <span class="fl" style="animation-delay: 0s;">A</span>
+    <span class="fl" style="animation-delay: 1s;">B</span>
+    <span class="fl" style="animation-delay: 2s;">C</span>
   </div>
 
-  <div class="hero">
-    <div class="logo-wrap">
-      <span class="logo-letter">L</span><span class="logo-letter">E</span><span class="logo-letter">T</span>
-      <span class="logo-letter">R</span><span class="logo-letter">I</span><span class="logo-letter">X</span>
-      <span class="logo-star">⭐</span>
+  <div class="cta-area">
+    <div class="logo-home-container">
+    <img src="logo.png" alt="Logo Letrix" class="logo-inicial">
+    </div>
+    <div class="game-modes">
+      <button class="btn-play" onclick="window.location.href='jogar.html'">
+        <span class="btn-icon">🔤</span> Letrix Palavras
+      </button>
+      
+      <button class="btn-play mode-drag" onclick="window.location.href='drag.html'">
+        <span class="btn-icon">🎯</span> Letrix Arrastar
+      </button>
+
+      <button class="btn-play" onclick="window.location.href='memoria.html'" style="background: linear-gradient(135deg, #74B9FF, #0984e3); box-shadow: 0 8px 0 #0984e3, 0 12px 20px rgba(0,0,0,0.1);">
+      <span class="btn-icon">🧩</span> Letrix Memória
+      </button>
+
     </div>
 
-    <p class="tagline">Aprenda palavras brincando!</p>
-
-    <div class="game-preview">
-      <div class="preview-label">Como funciona</div>
-      <div class="image-box"><span class="image-emoji">🦁</span></div>
-
-      <div class="word-slots">
-        <div class="slot filled">L</div>
-        <div class="slot filled">E</div>
-        <div class="slot filled">Ã</div>
-        <div class="slot"></div>
-      </div>
-
-      <div class="letter-choices">
-        <div class="lc lc-used">L</div><div class="lc lc-used">E</div>
-        <div class="lc lc-used">Ã</div><div class="lc">O</div>
-        <div class="lc">X</div><div class="lc">V</div>
-      </div>
+    <div class="secondary-btns">
+      <button class="btn-creditos" onclick="window.location.href='creditos.html'">
+        ℹ️ Créditos
+      </button>
+      <button class="btn-creditos" onclick="window.location.href='dashboard.html'" style="background-color: #6c5ce7; color: white; border-color: #6c5ce7;">
+        📊 Relatório
+      </button>
+      <button class="btn-som" id="btn-som" onclick="toggleMusica()">🔇</button>
     </div>
-
-<div class="cta-area">
-  <div class="game-modes">
-    <button class="btn-play" onclick="window.location.href='jogar.html'">
-      <span class="btn-icon">🔤</span> Letrix Palavras
-    </button>
-    
-    <button class="btn-play mode-drag" onclick="window.location.href='drag.html'">
-      <span class="btn-icon">🎯</span> Letrix Arrastar
-    </button>
   </div>
 
-  <div class="secondary-btns">
-    <button class="btn-creditos" onclick="window.location.href='creditos.html'">
-      ℹ️ Créditos
-    </button>
+  <script>
+    const musica = document.getElementById("musica-fundo");
+    const btnSom = document.getElementById("btn-som");
+    let tocando = false;
 
-    <button class="btn-som" id="btn-som" onclick="toggleMusica()">
-      🔇
-    </button>
-  </div>
-</div>
-
-<script>
-  const musica = document.getElementById("musica-fundo");
-  const btnSom = document.getElementById("btn-som");
-  let tocando = false;
-
-  function toggleMusica() {
-    if (!tocando) {
-      musica.play().catch(e => console.log("O navegador bloqueou o som inicial. Clique novamente."));
-      tocando = true;
-      btnSom.textContent = "🔊";
-      btnSom.style.background = "#55EFC4"; // Muda cor quando ativo
-    } else {
-      musica.pause();
-      tocando = false;
-      btnSom.textContent = "🔇";
-      btnSom.style.background = "#ff7e5f";
+    function toggleMusica() {
+      if (!tocando) {
+        musica.play();
+        btnSom.textContent = "🔊";
+        tocando = true;
+      } else {
+        musica.pause();
+        btnSom.textContent = "🔇";
+        tocando = false;
+      }
     }
-  }
-</script>
-  </body>
+  </script>
+</body>
 </html>
