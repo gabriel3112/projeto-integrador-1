@@ -1,76 +1,105 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+  <!-- Metadados do documento -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Letrix – Aprenda palavras brincando!</title>
+  
+  <!-- Vinculação do Manifesto Web PWA para o instalador e PWABuilder -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#6c5ce7">
+  
+  <!-- Importação de fontes do Google Fonts (Fredoka One e Nunito) para visual lúdico -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css">
+  
+  <!-- Link para a folha de estilo principal do menu inicial -->
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-  <audio id="musica-fundo" loop>
-    <source src="The_Toybox_Sprint.mp3" type="audio/mp3">
-  </audio>
-
+  <!-- Bolhas decorativas flutuantes no fundo da tela (efeito CSS) -->
   <div class="bg-bubbles">
     <div class="bubble"></div><div class="bubble"></div>
     <div class="bubble"></div><div class="bubble"></div>
     <div class="bubble"></div><div class="bubble"></div>
   </div>
 
+  <!-- Letras flutuantes decorativas no fundo que complementam o tema de alfabetização -->
   <div class="floating-letters">
-    <span class="fl" style="animation-delay: 0s;">A</span>
-    <span class="fl" style="animation-delay: 1s;">B</span>
-    <span class="fl" style="animation-delay: 2s;">C</span>
+    <span class="fl">A</span><span class="fl">B</span><span class="fl">C</span><span class="fl">D</span>
+    <span class="fl">E</span><span class="fl">Z</span><span class="fl">M</span><span class="fl">P</span>
   </div>
 
-  <div class="cta-area">
-    <div class="logo-home-container">
-    <img src="logo.png" alt="Logo Letrix" class="logo-inicial">
-    </div>
-    <div class="game-modes">
-      <button class="btn-play" onclick="window.location.href='jogar.html'">
-        <span class="btn-icon">🔤</span> Letrix Palavras
-      </button>
-      
-      <button class="btn-play mode-drag" onclick="window.location.href='drag.html'">
-        <span class="btn-icon">🎯</span> Letrix Arrastar
-      </button>
-
-      <button class="btn-play" onclick="window.location.href='memoria.html'" style="background: linear-gradient(135deg, #74B9FF, #0984e3); box-shadow: 0 8px 0 #0984e3, 0 12px 20px rgba(0,0,0,0.1);">
-      <span class="btn-icon">🧩</span> Letrix Memória
-      </button>
-
+  <!-- Área principal do menu (Hero Section) -->
+  <div class="hero">
+    <!-- Logotipo principal com letras coloridas individuais -->
+    <div class="logo-wrap">
+      <span class="logo-letter">L</span><span class="logo-letter">E</span><span class="logo-letter">T</span>
+      <span class="logo-letter">R</span><span class="logo-letter">I</span><span class="logo-letter">X</span>
+      <span class="logo-star">⭐</span>
     </div>
 
-    <div class="secondary-btns">
-      <button class="btn-creditos" onclick="window.location.href='creditos.html'">
-        ℹ️ Créditos
-      </button>
-      <button class="btn-creditos" onclick="window.location.href='dashboard.html'" style="background-color: #6c5ce7; color: white; border-color: #6c5ce7;">
-        📊 Relatório
-      </button>
-      <button class="btn-som" id="btn-som" onclick="toggleMusica()">🔇</button>
+    <!-- Slogan educativo do jogo -->
+    <p class="tagline">Aprenda palavras brincando!</p>
+
+    <!-- Card de exibição do Mascote (Leão gerado por IA para visual premium) -->
+    <div class="game-preview">
+      <img src="assets/lion_mascot.png" alt="Mascote Letrix" class="mascot-img-large">
+    </div>
+
+    <!-- Seção de Ações e Modos de Jogo -->
+    <div class="cta-area">
+      <!-- Grade contendo os 3 modos de jogo disponíveis -->
+      <div class="game-modes">
+        <!-- Botão para iniciar o jogo Letrix Palavras (Spelling) -->
+        <button class="btn-play" onclick="window.location.href='jogar.html'">
+          <span class="btn-icon">🔤</span> Letrix Palavras
+        </button>
+        
+        <!-- Botão para iniciar o jogo Letrix Arrastar (Coordenação Motora) -->
+        <button class="btn-play mode-drag" onclick="window.location.href='drag.html'">
+          <span class="btn-icon">🎯</span> Letrix Arrastar
+        </button>
+
+        <!-- Botão para iniciar o jogo Letrix Memória (Associação e Memória) -->
+        <button class="btn-play mode-memoria" onclick="window.location.href='memoria.html'">
+          <span class="btn-icon">🧠</span> Letrix Memória
+        </button>
+      </div>
+
+      <!-- Fileira de botões secundários utilitários e de controle -->
+      <div class="secondary-btns">
+        <!-- Botão de acesso ao Painel Pedagógico de métricas educacionais (Dashboard) -->
+        <button class="btn-dashboard" onclick="window.location.href='dashboard.html'">
+          📊 Painel Pedagógico
+        </button>
+
+        <!-- Botão para exibir a tela de Créditos dos desenvolvedores e instituição -->
+        <button class="btn-creditos" onclick="window.location.href='creditos.html'">
+          ℹ️ Créditos
+        </button>
+
+        <!-- Botão de som global para Ligar/Desligar a música de fundo -->
+        <button class="btn-som" id="btn-som" onclick="toggleMusica()">
+          🔇
+        </button>
+      </div>
     </div>
   </div>
 
+  <!-- Inclusão do Gerenciador de Áudio Persistente -->
+  <script src="js/audio.js"></script>
+
+  <!-- Registro de Service Worker para habilitar recursos de PWA e Cache offline -->
   <script>
-    const musica = document.getElementById("musica-fundo");
-    const btnSom = document.getElementById("btn-som");
-    let tocando = false;
-
-    function toggleMusica() {
-      if (!tocando) {
-        musica.play();
-        btnSom.textContent = "🔊";
-        tocando = true;
-      } else {
-        musica.pause();
-        btnSom.textContent = "🔇";
-        tocando = false;
-      }
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then((reg) => console.log('PWA Service Worker registrado no escopo:', reg.scope))
+          .catch((err) => console.error('Falha ao registrar Service Worker do PWA:', err));
+      });
     }
   </script>
 </body>

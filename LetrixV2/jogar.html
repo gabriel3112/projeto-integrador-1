@@ -1,296 +1,116 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+  <!-- Metadados de codificação e responsividade -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Letrix – Jogar</title>
+  
+  <!-- Fontes importadas para o visual lúdico infantil -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="jogar.css">
+  
+  <!-- CSS específico da jogabilidade Letrix Palavras -->
+  <link rel="stylesheet" href="css/jogar.css">
 </head>
 <body>
 
+  <!-- Bolhas flutuantes decorativas em segundo plano -->
   <div class="bg-bubbles">
     <div class="bubble"></div><div class="bubble"></div>
     <div class="bubble"></div><div class="bubble"></div>
   </div>
 
+  <!-- Contêiner de confete ativado sob vitória de palavra -->
   <div class="confetti-wrap" id="confetti-wrap"></div>
 
+  <!-- Cabeçalho do Jogo -->
   <div class="header">
+    <!-- Botão de retorno ao menu principal com micro-animação elástica -->
     <button class="btn-back" onclick="window.location.href='index.html'">←</button>
+    
+    <!-- Mini logotipo do jogo -->
     <div class="logo-mini">
       <span>L</span><span>E</span><span>T</span><span>R</span><span>I</span><span>X</span>
     </div>
+    
+    <!-- Exibição gráfica das vidas restantes (corações vermelhos) -->
     <div class="lives" id="lives-display"></div>
   </div>
 
+  <!-- Barra de Progresso de palavras do desafio -->
   <div class="progress-area">
     <div class="progress-info">
+      <!-- Exibe "Palavra X de Y" -->
       <span id="progress-text">Palavra 1</span>
-      <span class="badge" id="category-badge">...</span>
+      <!-- Porcentagem de conclusão da lista -->
+      <span id="progress-pct">0%</span>
     </div>
-    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
-    <div class="timer-bar" id="timer-bar"></div>
+    <div class="progress-bar-bg">
+      <!-- Div que expande horizontalmente à medida que acerta -->
+      <div class="progress-bar-fill" id="progress-fill" style="width: 0%"></div>
+    </div>
   </div>
 
-  <div class="game-board">
-    <div class="current-emoji" id="current-emoji"></div>
+  <!-- Faixa de Informações da partida -->
+  <div class="score-strip">
+    <!-- Marcador de palavras seguidas (streak) com ícone de fogo -->
+    <div class="score-pill score-streak"><span class="icon">🔥</span><span id="streak-val">0</span> seguidas</div>
+    <!-- Temporizador com contagem regressiva por palavra -->
+    <div class="score-pill score-timer"><span class="icon">⏱</span><span id="timer-val">30</span>s</div>
+  </div>
+
+  <!-- Área de Interação do Jogo -->
+  <div class="game-area">
+    <!-- Card central contendo a representação visual (pictograma/emoji) -->
+    <div class="image-card">
+      <div class="image-frame" id="image-frame">
+        <!-- Emoji que ilustra o conceito da palavra -->
+        <span id="word-emoji" style="line-height:1; font-size:80px;">🦁</span>
+        <!-- Botão para pedir ajuda/revelar a próxima letra correta (Dica) -->
+        <button class="hint-btn" id="hint-btn" title="Dica">💡</button>
+      </div>
+      <!-- Categoria da palavra atual (Ex: Animais) -->
+      <span class="category-badge" id="category-badge">Animais</span>
+    </div>
+
+    <!-- Slots vazios que serão preenchidos pelas letras para formar a palavra -->
     <div class="word-slots" id="word-slots"></div>
-    <div class="letter-choices" id="letter-choices"></div>
-  </div>
+    
+    <!-- Grade com as letras embaralhadas e distratores que a criança irá clicar -->
+    <div class="letter-grid" id="letter-grid"></div>
 
-  <div class="bottom-bar">
-    <div class="stats">
-      <span>🏆 <strong id="score-val">0</strong></span>
-      <span>🔥 <strong id="streak-val">0</strong></span>
+    <!-- Botões de controle de ação da resposta -->
+    <div class="action-row">
+      <!-- Botão para limpar todas as letras inseridas nos slots -->
+      <button class="btn-clear" id="btn-clear">🔄 Apagar</button>
+      <!-- Botão para validar se a palavra digitada está correta (habilitado ao preencher todos os slots) -->
+      <button class="btn-confirm" id="btn-confirm" disabled>✓ Confirmar</button>
     </div>
-    <button class="btn-confirm" id="btn-confirm">✓ Confirmar</button>
   </div>
 
+  <!-- Overlay modal de feedback (Venceu/Errou/Zerou) -->
   <div class="overlay" id="overlay">
-    <div class="overlay-card">
-      <div class="overlay-emoji" id="ov-emoji"></div>
-      <div class="overlay-title" id="ov-title"></div>
-      <div class="overlay-sub" id="ov-sub"></div>
-      <div class="overlay-pts" id="ov-pts"></div>
-      <button class="btn-next" id="btn-next">Próxima</button>
+    <div class="overlay-card" id="overlay-card">
+      <!-- Emoji que ilustra o resultado (Ex: 🎉 ou 😢) -->
+      <div class="overlay-emoji" id="ov-emoji">🎉</div>
+      <!-- Título de feedback principal -->
+      <div class="overlay-title" id="ov-title">Arrasou!</div>
+      <!-- Subtítulo com detalhes (Ex: a grafia correta) -->
+      <div class="overlay-sub" id="ov-sub">A palavra era LEÃO</div>
+      <!-- Botão para prosseguir no fluxo do jogo -->
+      <button class="btn-next" id="btn-next">Próxima ➜</button>
     </div>
   </div>
 
-  <script src="palavras.js"></script>
-  <script>
-    let WORDS = [];
-    const COLORS = ['#FF6B6B','#74B9FF','#55EFC4','#A29BFE','#FDCB6E','#FD79A8','#FF8E53','#00b894'];
-    const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  <!-- Botão flutuante de mute/unmute do áudio no canto inferior direito -->
+  <button class="btn-som" id="btn-som" onclick="toggleMusica()">🔇</button>
 
-    let currentIdx = 0, score = 0, streak = 0, lives = 3;
-    let filledSlots = [];
-    let timerSec = 30, timerInterval = null;
-    let errosNaPalavra = 0;
-    let tempoInicioPalavra = Date.now();
-
-    // WEB AUDIO API PARA EFEITOS SONOROS
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-    function tocarAcerto() {
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.connect(gain); gain.connect(audioCtx.destination);
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
-      gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
-      osc.start(); osc.stop(audioCtx.currentTime + 0.3);
-    }
-
-    function tocarErro() {
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.connect(gain); gain.connect(audioCtx.destination);
-      osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-      gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
-      osc.start(); osc.stop(audioCtx.currentTime + 0.2);
-    }
-
-    // GRAVAR DADOS PARA O DASHBOARD
-    function salvarEstatistica(jogo, fase, erros, tempoGasto) {
-      let historico = JSON.parse(localStorage.getItem('letrix_historico')) || [];
-      historico.push({
-        data: new Date().toLocaleString('pt-BR'),
-        jogo: jogo, fase: fase, erros: erros, tempo: tempoGasto
-      });
-      localStorage.setItem('letrix_historico', JSON.stringify(historico));
-    }
-
-    function initWords() {
-      if (typeof CONTEUDO_TXT !== 'undefined' && CONTEUDO_TXT.trim()) {
-        const linhas = CONTEUDO_TXT.trim().split('\n');
-        const todas = linhas.map(l => {
-          const p = l.trim().split('|');
-          return p.length >= 3 ? { word: p[0].toUpperCase(), emoji: p[1], category: p[2] } : null;
-        }).filter(i => i !== null);
-        todas.sort(() => Math.random() - 0.5);
-        WORDS = todas.slice(0, 10);
-      } else {
-        WORDS = [{ word: "BOLO", emoji: "🎂", category: "Comidas" }];
-      }
-      loadWord();
-    }
-
-    function loadWord() {
-      if (WORDS.length === 0) return;
-      const current = WORDS[currentIdx];
-      
-      document.getElementById('progress-text').textContent = `Palavra ${currentIdx + 1} de ${WORDS.length}`;
-      document.getElementById('current-emoji').textContent = current.emoji;
-      document.getElementById('category-badge').textContent = current.category;
-      document.getElementById('progress-fill').style.width = (((currentIdx + 1) / WORDS.length) * 100) + '%';
-
-      errosNaPalavra = 0;
-      tempoInicioPalavra = Date.now();
-      filledSlots = Array(current.word.length).fill(null).map(() => ({ letter: "" }));
-
-      const slotsContainer = document.getElementById('word-slots');
-      slotsContainer.innerHTML = '';
-      filledSlots.forEach((slot, index) => {
-        const div = document.createElement('div');
-        div.className = 'ws';
-        div.addEventListener('click', () => removerLetra(index));
-        slotsContainer.appendChild(div);
-      });
-
-      const letrasOpcoes = current.word.split('');
-      while (letrasOpcoes.length < Math.max(current.word.length + 3, 8)) {
-        const rand = ALPHABET[Math.floor(Math.random() * ALPHABET.length)];
-        if (!letrasOpcoes.includes(rand)) letrasOpcoes.push(rand);
-      }
-      letrasOpcoes.sort(() => Math.random() - 0.5);
-
-      const choicesContainer = document.getElementById('letter-choices');
-      choicesContainer.innerHTML = '';
-      letrasOpcoes.forEach(letra => {
-        const div = document.createElement('div');
-        div.className = 'lc'; div.textContent = letra;
-        div.style.backgroundColor = COLORS[Math.floor(Math.random() * COLORS.length)];
-        div.addEventListener('click', () => inserirLetra(letra, div));
-        choicesContainer.appendChild(div);
-      });
-
-      resetTimer(); renderLives();
-    }
-
-    function inserirLetra(letra, el) {
-      const idx = filledSlots.findIndex(s => s.letter === "");
-      if (idx === -1) return;
-      el.classList.add('lc-used'); el.style.pointerEvents = 'none';
-      filledSlots[idx] = { letter: letra, originElement: el };
-      document.getElementById('word-slots').children[idx].textContent = letra;
-    }
-
-    function removerLetra(idx) {
-      if (filledSlots[idx].letter === "") return;
-      const origin = filledSlots[idx].originElement;
-      if (origin) { origin.classList.remove('lc-used'); origin.style.pointerEvents = 'auto'; }
-      filledSlots[idx] = { letter: "" };
-      document.getElementById('word-slots').children[idx].textContent = "";
-    }
-
-    document.getElementById('btn-confirm').addEventListener('click', () => {
-      const currentWord = WORDS[currentIdx].word;
-      const userWord = filledSlots.map(s => s.letter).join('');
-      const slots = document.getElementById('word-slots').children;
-
-      if (userWord.length < currentWord.length) {
-        Array.from(slots).forEach(el => { el.classList.add('wrong'); setTimeout(() => el.classList.remove('wrong'), 400); });
-        return;
-      }
-
-      if (userWord === currentWord) {
-        clearInterval(timerInterval);
-        const earned = 100 + (timerSec * 2);
-        score += earned; streak++;
-        document.getElementById('score-val').textContent = score;
-        document.getElementById('streak-val').textContent = streak;
-
-        tocarAcerto();
-        const tempoGasto = ((Date.now() - tempoInicioPalavra) / 1000).toFixed(1);
-        salvarEstatistica("Soletração", currentWord, errosNaPalavra, tempoGasto);
-        
-        showOverlay(WORDS[currentIdx].emoji, "Arrasou!", "A palavra era " + currentWord, "+" + earned + " pts", true);
-        launchConfetti();
-      } else {
-        streak = 0; document.getElementById('streak-val').textContent = streak;
-        lives--; renderLives();
-        tocarErro(); errosNaPalavra++;
-
-        Array.from(slots).forEach(el => { el.classList.add('wrong'); setTimeout(() => el.classList.remove('wrong'), 400); });
-        
-        if (lives <= 0) {
-          clearInterval(timerInterval);
-          salvarEstatistica("Soletração", currentWord, errosNaPalavra, ((Date.now() - tempoInicioPalavra) / 1000).toFixed(1));
-          gameOver();
-        }
-      }
-    });
-
-    function resetTimer() {
-      clearInterval(timerInterval);
-      timerSec = 30;
-      const timerBar = document.getElementById('timer-bar');
-      timerBar.style.width = '100%'; timerBar.style.backgroundColor = '#00b894';
-
-      timerInterval = setInterval(() => {
-        timerSec--;
-        timerBar.style.width = (timerSec / 30) * 100 + '%';
-        if (timerSec <= 10) timerBar.style.backgroundColor = '#FF6B6B';
-        if (timerSec <= 0) {
-          clearInterval(timerInterval); tocarErro(); errosNaPalavra++; lives--; renderLives();
-          if (lives <= 0) {
-            salvarEstatistica("Soletração", WORDS[currentIdx].word, errosNaPalavra, ((Date.now() - tempoInicioPalavra) / 1000).toFixed(1));
-            gameOver();
-          } else {
-            showOverlay("⏰", "Tempo Esgotado!", "Vamos para a próxima.", "0 pts", true);
-          }
-        }
-      }, 1000);
-    }
-
-    function renderLives() {
-      const display = document.getElementById('lives-display');
-      display.innerHTML = '';
-      for (let i = 0; i < 3; i++) {
-        const span = document.createElement('span');
-        span.className = i < lives ? 'heart' : 'heart empty';
-        span.textContent = '❤️';
-        display.appendChild(span);
-      }
-    }
-
-    function showOverlay(emoji, title, subText, ptsText, isWin) {
-      document.getElementById('ov-emoji').textContent = emoji;
-      document.getElementById('ov-title').textContent = title;
-      document.getElementById('ov-sub').textContent = subText;
-      const ptsEl = document.getElementById('ov-pts');
-      ptsEl.textContent = ptsText; ptsEl.className = 'overlay-pts ' + (isWin ? 'ok' : 'fail');
-      const btn = document.getElementById('btn-next');
-      btn.className = 'btn-next ' + (isWin ? 'ok' : 'fail');
-      
-      if (!isWin) {
-        btn.textContent = '🔄 Voltar ao Menu';
-        btn.onclick = () => window.location.href = 'index.html';
-      } else {
-        btn.textContent = 'Próxima ➜';
-        btn.onclick = () => {
-          document.getElementById('overlay').classList.remove('show');
-          currentIdx++;
-          if (currentIdx >= WORDS.length) {
-            showOverlay("🏆", "Zerou!", "Você é incrível!", "Total: " + score, false);
-          } else loadWord();
-        };
-      }
-      document.getElementById('overlay').classList.add('show');
-    }
-
-    function gameOver() { showOverlay("😢", "Fim de Jogo!", "Acabaram as vidas.", "Total: " + score, false); }
-
-    function launchConfetti() {
-      const wrap = document.getElementById('confetti-wrap'); wrap.innerHTML = '';
-      for (let i = 0; i < 40; i++) {
-        const c = document.createElement('div'); c.className = 'conf';
-        c.style.left = Math.random() * 100 + '%';
-        c.style.background = COLORS[Math.floor(Math.random() * COLORS.length)];
-        c.style.width = (6 + Math.random() * 8) + 'px'; c.style.height = (10 + Math.random() * 10) + 'px';
-        c.style.animationDelay = (Math.random() * 0.5) + 's'; wrap.appendChild(c);
-      }
-    }
-
-    window.addEventListener('DOMContentLoaded', initWords);
-  </script>
+  <!-- Dependências JavaScript do jogo -->
+  <script src="js/audio.js"></script>          <!-- Gerencia áudio persistente -->
+  <script src="js/dashboard.js"></script>      <!-- Registra métricas pedagógicas -->
+  <script src="js/db.js"></script>             <!-- Banco de dados IndexedDB -->
+  <script src="js/palavras.js"></script>       <!-- Banco de dados de palavras -->
+  <script src="js/game-palavras.js"></script>  <!-- Lógica da mecânica de spelling -->
 </body>
 </html>

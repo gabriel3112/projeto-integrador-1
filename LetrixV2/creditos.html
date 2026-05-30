@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+  <!-- Metadados de codificação -->
   <meta charset="UTF-8">
   <title>Créditos - Letrix</title>
-  <link rel="stylesheet" href="style.css">
+  <!-- Folha de estilo padrão -->
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-  <!-- Fundo animado (bolhas) -->
+  <!-- Bolhas decorativas flutuantes de fundo -->
   <div class="bg-bubbles">
     <div class="bubble"></div>
     <div class="bubble"></div>
@@ -17,10 +19,12 @@
     <div class="bubble"></div>
   </div>
 
-  <!-- Conteúdo -->
+  <!-- Conteúdo de Informações Acadêmicas -->
   <div class="creditos-container">
+    <!-- Título principal -->
     <h1>🎮 Créditos</h1>
 
+    <!-- Autores/Desenvolvedores do Projeto -->
     <h2>Produção do Jogo</h2>
     <p>
       Desenvolvido por:<br>
@@ -28,24 +32,35 @@
       <strong>Davi Arthur Altino De Souza</strong>
     </p>
 
+    <!-- Resumo do jogo -->
     <h2>Sobre o Letrix</h2>
     <p>
       O Letrix foi criado como um jogo educativo para ajudar crianças
       a aprenderem palavras de forma divertida e interativa.
     </p>
 
+    <!-- Tecnologias utilizadas (academicamente relevantes) -->
     <h2>Tecnologias usadas</h2>
     <p>HTML, CSS e JavaScript</p>
 
+    <!-- Instituição vinculada -->
     <h2>Instituição</h2>
     <p>Centro Universitário de Brasília (CEUB)</p>
 
+    <!-- Ano de conclusão -->
     <h2>Ano</h2>
     <p>2025</p>
 
+    <!-- Botão de voltar ao menu inicial -->
     <button class="btn-creditos" onclick="window.location.href='index.html'" style="margin-top: 30px; width: 200px;">
       ⬅ Voltar ao Menu
     </button>
   </div>
+  
+  <!-- Botão de som / mute -->
+  <button class="btn-som" id="btn-som" onclick="toggleMusica()">🔇</button>
+  
+  <!-- Script de áudio persistente -->
+  <script src="js/audio.js"></script>
 </body>
 </html>

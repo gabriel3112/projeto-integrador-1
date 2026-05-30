@@ -1,82 +1,628 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Letrix - Área do Profissional</title>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel Pedagógico - Letrix</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
   <style>
+    /* Estilos específicos do Dashboard */
     .dashboard-container {
-      max-width: 800px; margin: 40px auto; padding: 30px;
-      background: white; border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-      position: relative; z-index: 10;
+      max-width: 1100px;
+      margin: 30px auto 80px;
+      padding: 20px;
+      position: relative;
+      z-index: 10;
     }
-    h1 { color: #6c5ce7; font-family: 'Fredoka One', cursive; text-align: center;}
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { padding: 12px; border: 1px solid #e0e0e0; text-align: center; }
-    th { background-color: #f1f2f6; color: #2d3436; }
-    .btn-print {
-      display: block; width: 200px; margin: 20px auto; padding: 10px;
-      background: #00b894; color: white; text-align: center;
-      border: none; border-radius: 10px; font-weight: bold; cursor: pointer;
+
+    .dash-header {
+      background: white;
+      border-radius: 24px;
+      padding: 30px;
+      text-align: center;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+      margin-bottom: 24px;
+      animation: fade-up 0.6s ease;
     }
-    .btn-print:hover { background: #55EFC4; }
-    @media print {
-      body { background: white; }
-      .bg-bubbles, .btn-print, .btn-creditos { display: none !important; }
-      .dashboard-container { box-shadow: none; margin: 0; padding: 0; }
+
+    .dash-title {
+      font-family: 'Fredoka One', cursive;
+      font-size: 28px;
+      color: #6c5ce7;
+      margin-bottom: 10px;
+    }
+
+    .dash-subtitle {
+      font-size: 15px;
+      color: #636e72;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+
+    .grid-sections {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 992px) {
+      .grid-sections {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .grid-sections {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel-card {
+      background: white;
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+      animation: fade-up 0.8s ease;
+    }
+
+    .panel-card-title {
+      font-family: 'Fredoka One', cursive;
+      font-size: 20px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .spelling-card-title { color: #FF8E53; }
+    .drag-card-title { color: #6c5ce7; }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .metric-box {
+      background: #FDF9F2;
+      border-radius: 16px;
+      padding: 16px;
+      text-align: center;
+      border: 1.5px solid #F3EAE0;
+    }
+
+    .metric-value {
+      font-family: 'Fredoka One', cursive;
+      font-size: 24px;
+      color: #2d3436;
+      margin-top: 4px;
+    }
+
+    .metric-label {
+      font-size: 12px;
+      font-weight: 800;
+      color: #b2bec3;
+      text-transform: uppercase;
+    }
+
+    .categories-box {
+      grid-column: span 2;
+      background: #F8F9FA;
+      border-radius: 16px;
+      padding: 14px;
+      margin-top: 8px;
+    }
+
+    .categories-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: #636e72;
+      margin-bottom: 8px;
+      text-align: left;
+    }
+
+    .tags-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tag-badge {
+      background: white;
+      border: 1.5px solid #dfe6e9;
+      border-radius: 20px;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #2d3436;
+    }
+
+    /* Seção Pedagógica */
+    .pedagogical-card {
+      background: white;
+      border-radius: 24px;
+      padding: 30px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+      margin-bottom: 24px;
+      animation: fade-up 1s ease;
+    }
+
+    .pedagogical-title {
+      font-family: 'Fredoka One', cursive;
+      font-size: 22px;
+      color: #2d3436;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .bncc-badge {
+      background: #E8F4FD;
+      color: #0984e3;
+      border: 1px solid #74B9FF;
+      border-radius: 12px;
+      padding: 2px 8px;
+      font-size: 12px;
+      font-weight: 800;
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+
+    .p-text {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #333;
+      margin-bottom: 18px;
+      text-align: justify;
+    }
+
+    .p-text strong {
+      color: #2d3436;
+    }
+
+    .action-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 30px;
+    }
+
+    .btn-action-reset {
+      padding: 12px 24px;
+      background: #FFEAEA;
+      color: #d63031;
+      border: 2px solid #ff7675;
+      border-radius: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      font-size: 14px;
+      transition: 0.2s;
+    }
+
+    .btn-action-reset:hover {
+      background: #d63031;
+      color: white;
+      transform: scale(1.03);
     }
   </style>
 </head>
 <body>
+
+  <!-- Fundo animado (bolhas) -->
   <div class="bg-bubbles">
-    <div class="bubble"></div><div class="bubble"></div><div class="bubble"></div>
+    <div class="bubble"></div><div class="bubble"></div>
+    <div class="bubble"></div><div class="bubble"></div>
+    <div class="bubble"></div><div class="bubble"></div>
+  </div>
+
+  <!-- Cabeçalho de Navegação Superior -->
+  <div class="header">
+    <!-- Botão com elástico em hover para retornar ao index -->
+    <button class="btn-back" onclick="window.location.href='index.html'">←</button>
+    <div class="logo-mini">
+      <span>L</span><span>E</span><span>T</span><span>R</span><span>I</span><span>X</span>
+    </div>
+    <!-- Botão de controle de mute/unmute do som de fundo -->
+    <button class="btn-som" id="btn-som" onclick="toggleMusica()">🔇</button>
   </div>
 
   <div class="dashboard-container">
-    <h1>📊 Relatório Psicopedagógico</h1>
-    <p style="text-align: center;">Acompanhamento de desempenho cognitivo e atenção.</p>
     
-    <table>
-      <thead>
-        <tr>
-          <th>Data/Hora</th>
-          <th>Jogo</th>
-          <th>Fase/Palavra</th>
-          <th>Erros Cometidos</th>
-          <th>Tempo (s)</th>
-        </tr>
-      </thead>
-      <tbody id="tabela-resultados">
-        </tbody>
-    </table>
+    <!-- Título Principal do Portal Pedagógico -->
+    <div class="dash-header">
+      <div class="dash-title">📊 Portal de Aprendizado</div>
+      <div class="dash-subtitle">Acompanhe as estatísticas de uso pedagógico e coordenação motora da criança no jogo.</div>
+    </div>
 
-    <button class="btn-print" onclick="window.print()">🖨️ Imprimir PDF</button>
-    <button class="btn-creditos" onclick="window.location.href='index.html'" style="display:block; margin: 0 auto; background: #FF6B6B; width: 200px;">Voltar ao Menu</button>
+    <!-- Grade contendo os 3 Painéis de Métricas (um para cada jogo) -->
+    <div class="grid-sections">
+      
+      <!-- Painel Letrix Palavras -->
+      <div class="panel-card">
+        <div class="panel-card-title spelling-card-title">🔤 Letrix Palavras</div>
+        
+        <div class="metric-grid">
+          <!-- Total de palavras tentadas -->
+          <div class="metric-box">
+            <div class="metric-label">Desafios Jogados</div>
+            <div class="metric-value" id="sp-played">0</div>
+          </div>
+          
+          <!-- Relação de acertos sobre erros em porcentagem -->
+          <div class="metric-box">
+            <div class="metric-label">Taxa de Acerto</div>
+            <div class="metric-value" id="sp-accuracy">0%</div>
+          </div>
+
+          <!-- Total de acertos na primeira tentativa (sem erros e sem uso de dicas) -->
+          <div class="metric-box">
+            <div class="metric-label">Sem usar Dicas</div>
+            <div class="metric-value" id="sp-no-hints">0</div>
+          </div>
+
+          <!-- Tempo médio gasto por palavra resolvida -->
+          <div class="metric-box">
+            <div class="metric-label">Tempo Médio</div>
+            <div class="metric-value" id="sp-avg-time">0s</div>
+          </div>
+
+          <!-- Relação das categorias das palavras exploradas pela criança -->
+          <div class="categories-box">
+            <div class="categories-title">Categorias Exploradas:</div>
+            <div class="tags-container" id="sp-categories">
+              <span class="tag-badge" style="color:#b2bec3; border-style:dashed;">Nenhuma ainda</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Painel Letrix Arrastar -->
+      <div class="panel-card">
+        <div class="panel-card-title drag-card-title">🎯 Letrix Arrastar</div>
+        
+        <div class="metric-grid">
+          <!-- Quantidade de tentativas iniciadas -->
+          <div class="metric-box">
+            <div class="metric-label">Níveis Jogados</div>
+            <div class="metric-value" id="dg-played">0</div>
+          </div>
+          
+          <!-- Quantidade de vezes que a criança guiou o foguete até o fim -->
+          <div class="metric-box">
+            <div class="metric-label">Conclusões (Vitórias)</div>
+            <div class="metric-value" id="dg-wins">0</div>
+          </div>
+
+          <!-- Totalizador de colisões com as paredes do labirinto (indicador de evolução motora) -->
+          <div class="metric-box">
+            <div class="metric-label">Batidas na Parede</div>
+            <div class="metric-value" id="dg-wall-hits" style="color:#d63031;">0</div>
+          </div>
+
+          <!-- Menor tempo de conclusão de nível registrado -->
+          <div class="metric-box">
+            <div class="metric-label">Tempo Recorde</div>
+            <div class="metric-value" id="dg-fastest">--</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Painel Letrix Memória -->
+      <div class="panel-card">
+        <div class="panel-card-title memory-card-title" style="color: #00b894;">🧠 Letrix Memória</div>
+        
+        <div class="metric-grid">
+          <!-- Total de partidas iniciadas -->
+          <div class="metric-box">
+            <div class="metric-label">Partidas Jogadas</div>
+            <div class="metric-value" id="me-played">0</div>
+          </div>
+          
+          <!-- Partidas em que todos os 6 pares foram encontrados -->
+          <div class="metric-box">
+            <div class="metric-label">Vitórias</div>
+            <div class="metric-value" id="me-wins">0</div>
+          </div>
+
+          <!-- Total de viradas de pares (indicador de eficiência de memória) -->
+          <div class="metric-box">
+            <div class="metric-label">Total Jogadas</div>
+            <div class="metric-value" id="me-moves">0</div>
+          </div>
+
+          <!-- Menor tempo de resolução do tabuleiro -->
+          <div class="metric-box">
+            <div class="metric-label">Tempo Recorde</div>
+            <div class="metric-value" id="me-fastest">--</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Histórico de Partidas Recentes (Banco de Dados IndexedDB) -->
+    <div class="pedagogical-card" style="margin-bottom: 24px;">
+      <div class="pedagogical-title" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <span>📜 Histórico de Partidas Recentes (Banco de Dados)</span>
+        <button class="btn-action-export" onclick="exportarHistoricoJSON()" style="padding: 8px 16px; background:#E8F4FD; color:#0984e3; border: 1.5px solid #74B9FF; border-radius:12px; font-weight:800; cursor:pointer; font-size:12px; transition:0.2s;">
+          📥 Exportar JSON
+        </button>
+      </div>
+
+      <!-- Filtros do Histórico -->
+      <div style="margin-bottom: 16px; display:flex; gap: 8px; flex-wrap:wrap; align-items:center;">
+        <span style="font-size: 13px; font-weight: 800; color: #636e72; margin-right: 8px;">Filtrar jogo:</span>
+        <button class="filter-btn active" onclick="filtrarHistorico('Todos', this)" style="padding: 6px 14px; border-radius: 12px; border: 1.5px solid #6c5ce7; background: #6c5ce7; color: white; cursor: pointer; font-size: 12px; font-weight: 800; transition:0.2s;">Todos</button>
+        <button class="filter-btn" onclick="filtrarHistorico('Letrix Palavras', this)" style="padding: 6px 14px; border-radius: 12px; border: 1.5px solid #dfe6e9; background: white; color: #2d3436; cursor: pointer; font-size: 12px; font-weight: 800; transition:0.2s;">Letrix Palavras</button>
+        <button class="filter-btn" onclick="filtrarHistorico('Letrix Arrastar', this)" style="padding: 6px 14px; border-radius: 12px; border: 1.5px solid #dfe6e9; background: white; color: #2d3436; cursor: pointer; font-size: 12px; font-weight: 800; transition:0.2s;">Letrix Arrastar</button>
+        <button class="filter-btn" onclick="filtrarHistorico('Letrix Memória', this)" style="padding: 6px 14px; border-radius: 12px; border: 1.5px solid #dfe6e9; background: white; color: #2d3436; cursor: pointer; font-size: 12px; font-weight: 800; transition:0.2s;">Letrix Memória</button>
+      </div>
+
+      <!-- Tabela do Histórico -->
+      <div style="overflow-x: auto; border-radius: 16px; border: 1.5px solid #F3EAE0;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; min-width: 500px;">
+          <thead>
+            <tr style="background: #FDF9F2; border-bottom: 1.5px solid #F3EAE0; font-weight: 800; color: #2d3436;">
+              <th style="padding: 12px 16px;">Data/Hora</th>
+              <th style="padding: 12px 16px;">Jogo</th>
+              <th style="padding: 12px 16px;">Resultado</th>
+              <th style="padding: 12px 16px;">Tempo</th>
+              <th style="padding: 12px 16px;">Detalhes</th>
+            </tr>
+          </thead>
+          <tbody id="historico-corpo">
+            <tr>
+              <td colspan="5" style="padding: 20px; text-align: center; color: #b2bec3; font-style: italic;">
+                Carregando histórico do banco de dados...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Fundamentação Pedagógica alinhada às diretrizes da BNCC (Base Nacional Comum Curricular) -->
+    <div class="pedagogical-card">
+      <div class="pedagogical-title">👨‍🏫 Relatório & Justificativa Pedagógica</div>
+      
+      <span class="bncc-badge">Base Nacional Comum Curricular (BNCC)</span>
+      
+      <p class="p-text">
+        O <strong>Letrix</strong> foi planejado e desenvolvido sob diretrizes educacionais acadêmicas, alinhando a prática de jogos computacionais com as competências essenciais da Educação Infantil e do Ensino Fundamental I (Processo de Alfabetização).
+      </p>
+
+      <h3 style="margin-bottom:8px; font-size:16px; color:#2d3436;">1. Letrix Palavras – Consciência Fonológica e Alfabetização</h3>
+      <p class="p-text">
+        Ao segmentar palavras em letras individuais e combiná-las visualmente com pictogramas (emojis), o jogo estimula o processo de <strong>decodificação e codificação fonema-grafema</strong>. 
+        O uso de distratores (letras extras) força a criança a exercitar o raciocínio ortográfico, diferenciando a estrutura correta de termos corriqueiros do seu vocabulário. 
+        No âmbito da BNCC, essa prática atende à habilidade <strong>EF01LP05</strong> (Reconhecer o sistema de escrita alfabética como representação dos sons da fala) e <strong>EF15LP03</strong> (Localizar informações explícitas em textos / formação vocabular).
+      </p>
+
+      <h3 style="margin-bottom:8px; font-size:16px; color:#2d3436;">2. Letrix Arrastar – Coordenação Motora Fina e Noções Espaciais</h3>
+      <p class="p-text">
+        O labirinto de arraste exige precisão espacial e regulação da velocidade de movimentação (controle motor fino). Ao colidir com as paredes, a criança recebe feedback tátil e visual imediato, aprendendo a adaptar sua orientação oculo-manual. 
+        Esse controle motor é um precursor fundamental para a habilidade de escrita manual (grafomotricidade).
+        Na Educação Infantil, correlaciona-se com a diretriz <strong>EI03CG05</strong> (Coordenar habilidades manuais no atendimento a situações diversas, desenvolvendo autonomia e precisão espacial).
+      </p>
+
+      <h3 style="margin-bottom:8px; font-size:16px; color:#2d3436;">3. Letrix Memória – Associação Semântica e Memória de Trabalho</h3>
+      <p class="p-text">
+        O jogo de memória desafia a criança a associar representações icônicas (emojis) com sua correspondente grafia por extenso. Essa associação biunívoca fortalece a <strong>memória de trabalho lexical</strong> e a consolidação de conceitos visuais-semânticos. 
+        Na BNCC, esta atividade trabalha a habilidade <strong>EF01LP12</strong> (Associar imagens e/ou objetos a palavras que os representam, desenvolvendo a compreensão da função social da escrita) e <strong>EF12LP01</strong> (Reconhecer que textos são lidos e escritos da esquerda para a direita, consolidando a ordenação das palavras na memória).
+      </p>
+    </div>
+
+    <!-- Botões de Ações e Limpeza de Estatísticas -->
+    <div class="action-row">
+      <!-- Botão para limpar/resetar o localStorage -->
+      <button class="btn-action-reset" onclick="confirmReset()">🧹 Limpar Estatísticas</button>
+      <!-- Botão para retornar à página inicial -->
+      <button class="btn-creditos" onclick="window.location.href='index.html'" style="padding: 12px 25px;">
+        🏠 Voltar ao Menu
+      </button>
+    </div>
+
   </div>
 
+  <!-- Inclusão de Scripts -->
+  <script src="js/audio.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/db.js"></script>
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const historico = JSON.parse(localStorage.getItem('letrix_historico')) || [];
-      const tbody = document.getElementById('tabela-resultados');
+    let todasPartidas = []; // Cache das partidas lidas do banco
 
-      if (historico.length === 0) {
-        tbody.innerHTML = "<tr><td colspan='5'>Nenhum registo efetuado. Jogue uma partida!</td></tr>";
+    // Função responsável por preencher os valores numéricos da interface com base nos dados do localStorage
+    function updateDashboardUI() {
+      // Carrega o objeto JSON de estatísticas
+      const stats = getStats();
+
+      // --- MÉTRIAS DE PALAVRAS (SPELLING) ---
+      const spPlayed = stats.spelling.played;
+      const spCorrect = stats.spelling.correct;
+      // Taxa percentual de acertos
+      const accuracy = spPlayed > 0 ? Math.round((spCorrect / spPlayed) * 100) : 0;
+      
+      document.getElementById('sp-played').textContent = spPlayed;
+      document.getElementById('sp-accuracy').textContent = accuracy + '%';
+      document.getElementById('sp-no-hints').textContent = stats.spelling.correctFirstTry;
+      
+      // Tempo médio gasto em segundos
+      const spAvgTime = spPlayed > 0 ? Math.round(stats.spelling.totalTimeSec / spPlayed) : 0;
+      document.getElementById('sp-avg-time').textContent = spAvgTime + 's';
+
+      // Renderiza as categorias jogadas em badges/tags dinâmicas
+      const catsContainer = document.getElementById('sp-categories');
+      catsContainer.innerHTML = '';
+      const categories = stats.spelling.categories;
+      const keys = Object.keys(categories);
+      
+      if (keys.length === 0) {
+        catsContainer.innerHTML = '<span class="tag-badge" style="color:#b2bec3; border-style:dashed;">Nenhuma ainda</span>';
       } else {
-        historico.reverse().forEach(registro => {
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td>${registro.data}</td>
-            <td><strong>${registro.jogo}</strong></td>
-            <td>${registro.fase}</td>
-            <td style="color: ${registro.erros > 0 ? '#d63031' : '#00b894'}; font-weight: 800;">${registro.erros}</td>
-            <td>${registro.tempo}s</td>
-          `;
-          tbody.appendChild(tr);
+        // Ordena as categorias mais jogadas no topo
+        keys.sort((a, b) => categories[b] - categories[a]);
+        keys.forEach(k => {
+          const count = categories[k];
+          const badge = document.createElement('span');
+          badge.className = 'tag-badge';
+          badge.textContent = `${k} (${count})`;
+          catsContainer.appendChild(badge);
         });
       }
+
+      // --- MÉTRIAS DE ARRASTAR (COORDENAÇÃO) ---
+      document.getElementById('dg-played').textContent = stats.drag.played;
+      document.getElementById('dg-wins').textContent = stats.drag.wins;
+      document.getElementById('dg-wall-hits').textContent = stats.drag.wallHits;
+
+      const fastest = stats.drag.fastestTimeSec;
+      document.getElementById('dg-fastest').textContent = fastest !== null ? fastest + 's' : '--';
+
+      // --- MÉTRIAS DE MEMÓRIA (COGNITIVO) ---
+      document.getElementById('me-played').textContent = stats.memory.played;
+      document.getElementById('me-wins').textContent = stats.memory.wins;
+      document.getElementById('me-moves').textContent = stats.memory.totalMoves;
+
+      const meFastest = stats.memory.fastestTimeSec;
+      document.getElementById('me-fastest').textContent = meFastest !== null ? meFastest + 's' : '--';
+    }
+
+    // Função que busca dados do IndexedDB e popula a tabela HTML
+    function carregarHistoricoTabela() {
+      if (typeof obterPartidas === 'function') {
+        obterPartidas().then(partidas => {
+          todasPartidas = partidas;
+          renderizarPartidas(todasPartidas);
+        }).catch(err => {
+          console.error("Erro ao ler dados de histórico:", err);
+        });
+      }
+    }
+
+    // Função auxiliar de formatação de data
+    function formatarDataHora(ts) {
+      const d = new Date(ts);
+      const dia = String(d.getDate()).padStart(2, '0');
+      const mes = String(d.getMonth() + 1).padStart(2, '0');
+      const ano = d.getFullYear();
+      const horas = String(d.getHours()).padStart(2, '0');
+      const minutos = String(d.getMinutes()).padStart(2, '0');
+      return `${dia}/${mes}/${ano} ${horas}:${minutos}`;
+    }
+
+    // Renderiza a lista de registros de partidas na tabela
+    function renderizarPartidas(lista) {
+      const corpo = document.getElementById('historico-corpo');
+      corpo.innerHTML = '';
+
+      if (lista.length === 0) {
+        corpo.innerHTML = `
+          <tr>
+            <td colspan="5" style="padding: 20px; text-align: center; color: #b2bec3; font-style: italic;">
+              Nenhuma partida registrada para o filtro selecionado.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      lista.forEach(p => {
+        const tr = document.createElement('tr');
+        tr.style.borderBottom = '1.5px solid #F3EAE0';
+        tr.style.background = 'white';
+        
+        // Estilização do badge de resultado
+        const isWin = p.resultado === 'Vitória';
+        const badgeColor = isWin ? '#00b894' : '#e74c3c';
+        const badgeBg = isWin ? '#D5F5E3' : '#FDECEA';
+
+        tr.innerHTML = `
+          <td style="padding: 10px 16px; color:#636e72;">${formatarDataHora(p.timestamp)}</td>
+          <td style="padding: 10px 16px; font-weight:700; color:#2d3436;">${p.jogo}</td>
+          <td style="padding: 10px 16px;">
+            <span style="display:inline-block; padding:3px 8px; border-radius:20px; font-weight:800; font-size:11px; background:${badgeBg}; color:${badgeColor};">
+              ${p.resultado}
+            </span>
+          </td>
+          <td style="padding: 10px 16px; color:#2d3436; font-weight:600;">${p.tempo}s</td>
+          <td style="padding: 10px 16px; color:#636e72; font-size:12px;">${p.detalhes}</td>
+        `;
+        corpo.appendChild(tr);
+      });
+    }
+
+    // Filtra a lista de partidas na tabela ao clicar nos botões de filtro
+    function filtrarHistorico(jogo, btnEl) {
+      // Remove a classe ativa dos outros botões de filtro
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.remove('active');
+        btn.style.background = 'white';
+        btn.style.color = '#2d3436';
+        btn.style.borderColor = '#dfe6e9';
+      });
+
+      // Aplica estilo ativo ao botão clicado
+      btnEl.classList.add('active');
+      btnEl.style.background = '#6c5ce7';
+      btnEl.style.color = 'white';
+      btnEl.style.borderColor = '#6c5ce7';
+
+      if (jogo === 'Todos') {
+        renderizarPartidas(todasPartidas);
+      } else {
+        const filtradas = todasPartidas.filter(p => p.jogo === jogo);
+        renderizarPartidas(filtradas);
+      }
+    }
+
+    // Exporta o banco de dados IndexedDB de partidas como arquivo JSON para download
+    function exportarHistoricoJSON() {
+      if (todasPartidas.length === 0) {
+        alert("Não há dados de partidas para exportar!");
+        return;
+      }
+
+      const jsonStr = JSON.stringify(todasPartidas, null, 2);
+      const blob = new Blob([jsonStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      
+      // Cria link oculto para download
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `historico_letrix_${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      
+      // Limpa referências
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // Caixa de diálogo de confirmação para limpar o progresso salvo e o banco de dados IndexedDB
+    function confirmReset() {
+      if (confirm("Deseja realmente apagar todos os dados de progresso e estatísticas do histórico? Esta ação não pode ser desfeita.")) {
+        resetStats();
+        if (typeof limparBancoDados === 'function') {
+          limparBancoDados().then(() => {
+            carregarHistoricoTabela(); // Recarrega tabela vazia
+            alert("Estatísticas e histórico limpos com sucesso!");
+          }).catch(err => {
+            console.error("Erro ao limpar banco de dados:", err);
+          });
+        }
+      }
+    }
+
+    // Aciona a renderização das estatísticas e tabela de histórico ao carregar o DOM
+    document.addEventListener('DOMContentLoaded', () => {
+      updateDashboardUI();
+      carregarHistoricoTabela();
     });
   </script>
 </body>
