@@ -101,6 +101,7 @@
 
   <!-- Inclusão do Gerenciador de Áudio Persistente -->
   <script src="js/audio.js"></script>
+  <script src="js/db.js"></script>
 
   <!-- Registro de Service Worker para habilitar recursos de PWA e Cache offline -->
   <script>
@@ -176,10 +177,23 @@
       const user = { name, age: age || null, escolaridade: school || null, handedness: handed || null, responsavel: resp || null, contact: contact || null, email: email || null, created: new Date().getTime() };
       users.push(user);
       saveUsers(users);
-      try { localStorage.setItem('letrix_user', name); } catch (e) {}
-      closeRegister();
-      // Navigate to dashboard and set hash to login to show current user
-      window.location.href = 'dashboard.html#login';
+      // Try to persist profile in IndexedDB (if available) before navigating
+      if (typeof salvarUsuario === 'function') {
+        salvarUsuario(user).then(id => {
+          try { localStorage.setItem('letrix_user', name); } catch (e) {}
+          closeRegister();
+          window.location.href = 'dashboard.html#login';
+        }).catch(err => {
+          console.error('Erro ao salvar usuario no IndexedDB:', err);
+          try { localStorage.setItem('letrix_user', name); } catch (e) {}
+          closeRegister();
+          window.location.href = 'dashboard.html#login';
+        });
+      } else {
+        try { localStorage.setItem('letrix_user', name); } catch (e) {}
+        closeRegister();
+        window.location.href = 'dashboard.html#login';
+      }
     });
 
     // If page loaded with #register, open modal

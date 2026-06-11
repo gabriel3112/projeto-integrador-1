@@ -7,7 +7,7 @@
  */
 
 const DB_NAME = 'LetrixDB'; // Nome do banco de dados
-const DB_VERSION = 1;      // Versão do banco de dados
+const DB_VERSION = 2;      // Versão do banco de dados (incrementado para adicionar store `usuarios`)
 const STORE_NAME = 'partidas'; // Nome da tabela/loja de objetos de partidas
 
 /**
@@ -21,13 +21,19 @@ function abrirDB() {
     // Evento disparado caso a versão mude ou seja a primeira criação do banco
     request.onupgradeneeded = (event) => {
       const db = event.target.result;
-      
+
       // Cria a loja de objetos 'partidas' com chave autoincrementável (id)
       if (!db.objectStoreNames.contains(STORE_NAME)) {
         const store = db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
-        
         // Cria índice baseado na data/timestamp para facilitar a ordenação cronológica
         store.createIndex('data', 'timestamp', { unique: false });
+      }
+
+      // Adiciona nova loja de usuários (profiles) quando atualizar a versão do DB
+      if (!db.objectStoreNames.contains('usuarios')) {
+        const ustore = db.createObjectStore('usuarios', { keyPath: 'id', autoIncrement: true });
+        // Índice por nome para consultas rápidas
+        ustore.createIndex('name', 'name', { unique: false });
       }
     };
 
@@ -109,6 +115,58 @@ function obterPartidas() {
 
       request.onerror = (event) => {
         console.error("Erro ao ler histórico do banco de dados:", event.target.error);
+        reject(event.target.error);
+      };
+    }).catch(reject);
+  });
+}
+
+/**
+ * Salva um perfil de usuário na loja `usuarios`
+ * @param {object} user - Objeto com campos: name, age, escolaridade, handedness, responsavel, contact, email, created
+ * @returns {Promise<number>} id gerado
+ */
+function salvarUsuario(user) {
+  return new Promise((resolve, reject) => {
+    abrirDB().then(db => {
+      const transaction = db.transaction('usuarios', 'readwrite');
+      const store = transaction.objectStore('usuarios');
+
+      if (!user.created) user.created = new Date().getTime();
+
+      const request = store.add(user);
+      request.onsuccess = (event) => resolve(event.target.result);
+      request.onerror = (event) => {
+        console.error('Erro ao salvar usuario no IndexedDB:', event.target.error);
+        reject(event.target.error);
+      };
+    }).catch(reject);
+  });
+}
+
+/**
+ * Recupera todos os perfis de usuários salvos
+ * @returns {Promise<Array>} lista de usuários ordenada por criação (mais recente primeiro)
+ */
+function obterUsuarios() {
+  return new Promise((resolve, reject) => {
+    abrirDB().then(db => {
+      const transaction = db.transaction('usuarios', 'readonly');
+      const store = transaction.objectStore('usuarios');
+
+      const usuarios = [];
+      const request = store.openCursor(null, 'prev');
+      request.onsuccess = (event) => {
+        const cursor = event.target.result;
+        if (cursor) {
+          usuarios.push(cursor.value);
+          cursor.continue();
+        } else {
+          resolve(usuarios);
+        }
+      };
+      request.onerror = (event) => {
+        console.error('Erro ao ler usuarios do IndexedDB:', event.target.error);
         reject(event.target.error);
       };
     }).catch(reject);
