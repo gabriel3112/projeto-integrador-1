@@ -237,7 +237,13 @@
     <!-- Título Principal do Portal Pedagógico -->
     <div class="dash-header">
       <div class="dash-title">📊 Portal de Aprendizado</div>
-      <div class="dash-subtitle">Acompanhe as estatísticas de uso pedagógico e coordenação motora da criança no jogo.</div>
+      <div style="display:flex; gap:12px; justify-content:center; align-items:center; flex-wrap:wrap;">
+        <div class="dash-subtitle">Acompanhe as estatísticas de uso pedagógico e coordenação motora da criança no jogo.</div>
+        <div id="user-area" style="font-size:13px; color:#636e72; font-weight:700;
+                    background:#FFF; border-radius:12px; padding:6px 10px; border:1px solid #f0f0f0;">
+          <!-- Login UI inserted here by JS -->
+        </div>
+      </div>
     </div>
 
     <!-- Grade contendo os 3 Painéis de Métricas (um para cada jogo) -->
@@ -435,6 +441,75 @@
   <script src="js/dashboard.js"></script>
   <script src="js/db.js"></script>
   <script>
+    // --- Simple username-only login (no password) ---
+    window.CURRENT_USER = null;
+
+    function updateUserUI() {
+      const area = document.getElementById('user-area');
+      area.innerHTML = '';
+      if (window.CURRENT_USER) {
+        const span = document.createElement('span');
+        span.textContent = 'Usuário: ' + window.CURRENT_USER;
+        span.style.marginRight = '8px';
+        const btn = document.createElement('button');
+        btn.textContent = 'Sair';
+        btn.style.padding = '6px 10px';
+        btn.style.borderRadius = '8px';
+        btn.style.border = '1px solid #dfe6e9';
+        btn.onclick = () => { logoutUser(); };
+        area.appendChild(span);
+        area.appendChild(btn);
+      } else {
+        const input = document.createElement('input');
+        input.placeholder = 'Login (apenas nome)';
+        input.style.padding = '6px 8px';
+        input.style.borderRadius = '8px';
+        input.style.border = '1px solid #dfe6e9';
+        input.id = 'login-input';
+        input.style.width = '140px';
+
+        const btn = document.createElement('button');
+        btn.textContent = 'Entrar';
+        btn.style.padding = '6px 10px';
+        btn.style.borderRadius = '8px';
+        btn.style.border = '1px solid #6c5ce7';
+        btn.style.background = '#6c5ce7';
+        btn.style.color = 'white';
+        btn.onclick = () => { const v = document.getElementById('login-input').value.trim(); if (v) setUser(v); };
+
+        area.appendChild(input);
+        area.appendChild(btn);
+        const regBtn = document.createElement('button');
+        regBtn.textContent = 'Registrar';
+        regBtn.style.padding = '6px 10px';
+        regBtn.style.borderRadius = '8px';
+        regBtn.style.border = '1px solid #dfe6e9';
+        regBtn.style.background = 'white';
+        regBtn.style.marginLeft = '6px';
+        regBtn.onclick = () => { window.location.href = 'index.html#register'; };
+        area.appendChild(regBtn);
+      }
+    }
+
+    function setUser(username) {
+      try {
+        localStorage.setItem('letrix_user', username);
+      } catch (e) {}
+      window.CURRENT_USER = username;
+      updateUserUI();
+      // Reload dashboard data for the selected user
+      updateDashboardUI();
+      carregarHistoricoTabela();
+    }
+
+    function logoutUser() {
+      try { localStorage.removeItem('letrix_user'); } catch (e) {}
+      window.CURRENT_USER = null;
+      updateUserUI();
+      updateDashboardUI();
+      carregarHistoricoTabela();
+    }
+
     let todasPartidas = []; // Cache das partidas lidas do banco
 
     // Função responsável por preencher os valores numéricos da interface com base nos dados do localStorage
@@ -497,7 +572,12 @@
     function carregarHistoricoTabela() {
       if (typeof obterPartidas === 'function') {
         obterPartidas().then(partidas => {
-          todasPartidas = partidas;
+          // If a user is logged, filter partidas to that user (records were tagged in db.save)
+          if (window.CURRENT_USER) {
+            todasPartidas = partidas.filter(p => p.user === window.CURRENT_USER);
+          } else {
+            todasPartidas = partidas;
+          }
           renderizarPartidas(todasPartidas);
         }).catch(err => {
           console.error("Erro ao ler dados de histórico:", err);
@@ -595,7 +675,9 @@
       // Cria link oculto para download
       const a = document.createElement('a');
       a.href = url;
-      a.download = `historico_letrix_${new Date().toISOString().split('T')[0]}.json`;
+      // Include username in filename when logged
+      const userSuffix = window.CURRENT_USER ? `_${window.CURRENT_USER}` : '';
+      a.download = `historico_letrix${userSuffix}_${new Date().toISOString().split('T')[0]}.json`;
       document.body.appendChild(a);
       a.click();
       
@@ -607,7 +689,8 @@
     // Caixa de diálogo de confirmação para limpar o progresso salvo e o banco de dados IndexedDB
     function confirmReset() {
       if (confirm("Deseja realmente apagar todos os dados de progresso e estatísticas do histórico? Esta ação não pode ser desfeita.")) {
-        resetStats();
+        // Reset stats for current user if logged, otherwise reset global stats
+        resetStats(window.CURRENT_USER);
         if (typeof limparBancoDados === 'function') {
           limparBancoDados().then(() => {
             carregarHistoricoTabela(); // Recarrega tabela vazia
@@ -621,8 +704,18 @@
 
     // Aciona a renderização das estatísticas e tabela de histórico ao carregar o DOM
     document.addEventListener('DOMContentLoaded', () => {
+      // Restore current user from localStorage (username-only, no password)
+      try { window.CURRENT_USER = localStorage.getItem('letrix_user') || null; } catch (e) { window.CURRENT_USER = null; }
+      updateUserUI();
       updateDashboardUI();
       carregarHistoricoTabela();
+      // If navigated with #login, focus the login input created by updateUserUI()
+      if (location.hash === '#login') {
+        setTimeout(() => {
+          const el = document.getElementById('login-input');
+          if (el) el.focus();
+        }, 60);
+      }
     });
   </script>
 </body>

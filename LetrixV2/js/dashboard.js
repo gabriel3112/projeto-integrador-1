@@ -5,7 +5,7 @@
  * armazenar os dados de forma persistente e gerar análises para os pais/professores.
  */
 
-// Chave utilizada para salvar o objeto JSON de estatísticas no localStorage
+// Chave base utilizada para salvar o objeto JSON de estatísticas no localStorage
 const STORAGE_KEY_STATS = 'letrix_stats';
 
 // Estrutura padrão de dados pedagógicos coletados (inicialização)
@@ -38,8 +38,10 @@ const DEFAULT_STATS = {
  * Carrega e analisa as estatísticas atuais salvas no localStorage do navegador
  * @returns {object} Objeto com dados do progresso da criança
  */
-function getStats() {
-  const data = localStorage.getItem(STORAGE_KEY_STATS);
+function getStats(username) {
+  username = username || window.CURRENT_USER || null;
+  const key = username ? `${STORAGE_KEY_STATS}_${username}` : STORAGE_KEY_STATS;
+  const data = localStorage.getItem(key);
   // Se for o primeiro acesso, clona e retorna a estrutura padrão inicial
   if (!data) {
     return JSON.parse(JSON.stringify(DEFAULT_STATS));
@@ -62,15 +64,18 @@ function getStats() {
  * Persiste as estatísticas estruturadas de volta no localStorage do navegador
  * @param {object} stats - Objeto de estatísticas atualizado
  */
-function saveStats(stats) {
-  localStorage.setItem(STORAGE_KEY_STATS, JSON.stringify(stats));
+function saveStats(stats, username) {
+  username = username || window.CURRENT_USER || null;
+  const key = username ? `${STORAGE_KEY_STATS}_${username}` : STORAGE_KEY_STATS;
+  localStorage.setItem(key, JSON.stringify(stats));
 }
 
 /**
  * Apaga e redefine todas as métricas para o valor padrão (reinício de progresso)
  */
-function resetStats() {
-  saveStats(DEFAULT_STATS);
+function resetStats(username) {
+  username = username || window.CURRENT_USER || null;
+  saveStats(DEFAULT_STATS, username);
   // Atualiza dinamicamente o painel caso a tela do dashboard esteja aberta
   if (typeof updateDashboardUI === 'function') {
     updateDashboardUI();

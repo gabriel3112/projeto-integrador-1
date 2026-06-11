@@ -76,6 +76,16 @@
           📊 Painel Pedagógico
         </button>
 
+        <!-- Botão de Login rápido que leva direto ao campo de login do dashboard -->
+        <button class="btn-login" onclick="window.location.href='dashboard.html#login'" title="Login (nome)">
+          🔐 Login
+        </button>
+
+        <!-- Botão para registrar novo usuário (abre modal) -->
+        <button class="btn-register" id="open-register-btn" title="Registrar criança">
+          ✍️ Registrar
+        </button>
+
         <!-- Botão para exibir a tela de Créditos dos desenvolvedores e instituição -->
         <button class="btn-creditos" onclick="window.location.href='creditos.html'">
           ℹ️ Créditos
@@ -100,6 +110,81 @@
           .then((reg) => console.log('PWA Service Worker registrado no escopo:', reg.scope))
           .catch((err) => console.error('Falha ao registrar Service Worker do PWA:', err));
       });
+    }
+  </script>
+
+  <!-- Registration Modal -->
+  <div id="register-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+    <div style="background:white; border-radius:12px; width:360px; max-width:92%; padding:18px; box-shadow:0 10px 40px rgba(0,0,0,0.25);">
+      <h3 style="margin:0 0 8px 0; font-family: 'Fredoka One', cursive; color:#6c5ce7;">Registrar nova criança</h3>
+      <p style="margin:0 0 12px 0; color:#636e72; font-size:13px;">Preencha os dados abaixo (sem senha).</p>
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <input id="reg-name" placeholder="Nome da criança" style="padding:8px;border:1px solid #dfe6e9;border-radius:8px;" />
+        <input id="reg-age" type="number" placeholder="Idade" style="padding:8px;border:1px solid #dfe6e9;border-radius:8px;" />
+        <input id="reg-school" placeholder="Escolaridade (Ex: 1º ano)" style="padding:8px;border:1px solid #dfe6e9;border-radius:8px;" />
+        <select id="reg-handed" style="padding:8px;border:1px solid #dfe6e9;border-radius:8px;">
+          <option value="">Destreza (destro/canhoto)</option>
+          <option value="Destro">Destro</option>
+          <option value="Canhoto">Canhoto</option>
+        </select>
+        <input id="reg-resp" placeholder="Nome do responsável" style="padding:8px;border:1px solid #dfe6e9;border-radius:8px;" />
+        <input id="reg-contact" placeholder="Telefone/Contato" style="padding:8px;border:1px solid #dfe6e9;border-radius:8px;" />
+        <input id="reg-email" placeholder="E-mail" style="padding:8px;border:1px solid #dfe6e9;border-radius:8px;" />
+      </div>
+      <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:12px;">
+        <button id="reg-cancel" style="padding:8px 12px; border-radius:8px; border:1px solid #dfe6e9; background:white;">Cancelar</button>
+        <button id="reg-save" style="padding:8px 12px; border-radius:8px; border:1px solid #6c5ce7; background:#6c5ce7; color:white;">Salvar & Entrar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Registration modal logic
+    const openReg = document.getElementById('open-register-btn');
+    const regModal = document.getElementById('register-modal');
+    const regCancel = document.getElementById('reg-cancel');
+    const regSave = document.getElementById('reg-save');
+
+    function openRegister() { regModal.style.display = 'flex'; document.getElementById('reg-name').focus(); }
+    function closeRegister() { regModal.style.display = 'none'; }
+
+    if (openReg) openReg.addEventListener('click', (e) => { e.preventDefault(); openRegister(); });
+    if (regCancel) regCancel.addEventListener('click', (e) => { e.preventDefault(); closeRegister(); });
+
+    function getUsers() {
+      try { return JSON.parse(localStorage.getItem('letrix_users') || '[]'); } catch (e) { return []; }
+    }
+
+    function saveUsers(list) { try { localStorage.setItem('letrix_users', JSON.stringify(list)); } catch (e) {} }
+
+    regSave.addEventListener('click', () => {
+      const name = document.getElementById('reg-name').value.trim();
+      const age = document.getElementById('reg-age').value.trim();
+      const school = document.getElementById('reg-school').value.trim();
+      const handed = document.getElementById('reg-handed').value;
+      const resp = document.getElementById('reg-resp').value.trim();
+      const contact = document.getElementById('reg-contact').value.trim();
+      const email = document.getElementById('reg-email').value.trim();
+
+      if (!name) { alert('Por favor, informe o nome da criança.'); document.getElementById('reg-name').focus(); return; }
+
+      const users = getUsers();
+      // Basic uniqueness by name+age to avoid duplicates
+      const exists = users.find(u => u.name === name && u.age == age);
+      if (exists) { if (!confirm('Usuário já existe. Deseja registrar de qualquer forma?')) return; }
+
+      const user = { name, age: age || null, escolaridade: school || null, handedness: handed || null, responsavel: resp || null, contact: contact || null, email: email || null, created: new Date().getTime() };
+      users.push(user);
+      saveUsers(users);
+      try { localStorage.setItem('letrix_user', name); } catch (e) {}
+      closeRegister();
+      // Navigate to dashboard and set hash to login to show current user
+      window.location.href = 'dashboard.html#login';
+    });
+
+    // If page loaded with #register, open modal
+    if (location.hash === '#register') {
+      setTimeout(() => openRegister(), 80);
     }
   </script>
 </body>

@@ -59,6 +59,14 @@ function salvarPartida(partida) {
         partida.timestamp = new Date().getTime();
       }
 
+      // Se existir um usuário logado globalmente, anexa ao registro (login sem senha support)
+      try {
+        const user = localStorage.getItem('letrix_user');
+        if (user) partida.user = user;
+      } catch (e) {
+        // Ignora erros de localStorage
+      }
+
       const request = store.add(partida);
 
       request.onsuccess = (event) => {
