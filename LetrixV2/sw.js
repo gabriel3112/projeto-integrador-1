@@ -6,7 +6,7 @@
  * do usuário esteja totalmente desconectado da internet.
  */
 
-const CACHE_NAME = 'letrix-v2-cache-v1';
+const CACHE_NAME = 'letrix-v2-cache-v4';
 
 // Lista de arquivos estáticos a serem cacheados na instalação
 const ASSETS_TO_CACHE = [
@@ -17,11 +17,13 @@ const ASSETS_TO_CACHE = [
   './memoria.html',
   './creditos.html',
   './dashboard.html',
+  './portfolio.html',
   './manifest.json',
   './css/style.css',
   './css/jogar.css',
   './css/drag.css',
   './css/memoria.css',
+  './css/portfolio.css',
   './js/audio.js',
   './js/dashboard.js',
   './js/db.js',
@@ -30,6 +32,9 @@ const ASSETS_TO_CACHE = [
   './js/game-drag.js',
   './js/game-memoria.js',
   './assets/lion_mascot.png',
+  './assets/psychologist.png',
+  './assets/office_1.jpg',
+  './assets/office_2.jpg',
   './assets/The_Toybox_Sprint.mp3',
   './assets/icon-192.png',
   './assets/icon-512.png'

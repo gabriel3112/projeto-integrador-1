@@ -6,11 +6,11 @@ BOLO|🎂|Comidas
 SAPO|🐸|Animais
 UVAS|🍇|Frutas
 PATO|🦆|Animais
-MACA|🍎|Frutas
+MAÇÃ|🍎|Frutas
 TREM|🚂|Veículos
 FOGO|🔥|Elementos
 BOLA|⚽|Esportes
-MACACO|🐵|Esportes
+MACACO|🐵|Animais
 PALHAÇO|🤡|Profissão
 CACHORRO|🐶|Animais
 TIGRE|🐯|Animais
@@ -105,4 +105,4 @@ ESCOVA|🪥|Objeto
 SOL|☀️|Estrelas
 LUA|🌑|Estrelas
 ESTRELA|⭐|Estrelas
-FOGO|🔥|Estrelas`;
+PLANETA|🪐|Estrelas`;

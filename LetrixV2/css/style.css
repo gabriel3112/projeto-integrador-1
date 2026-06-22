@@ -103,7 +103,11 @@ body { font-family: 'Nunito', sans-serif; background: #FFF9EC; min-height: 100vh
     border-radius: 15px;
     font-weight: 800;
     cursor: pointer;
-    transition: 0.2s;
+    transition: all 0.2s;
+}
+
+.btn-creditos:active, .btn-dashboard:active, .btn-login:active, .btn-register:active, .btn-portfolio:active {
+    transform: scale(0.95);
 }
 
 .btn-dashboard {
@@ -120,6 +124,54 @@ body { font-family: 'Nunito', sans-serif; background: #FFF9EC; min-height: 100vh
 .btn-dashboard:hover {
     transform: scale(1.05);
     box-shadow: 0 6px 20px rgba(116, 185, 255, 0.6);
+}
+
+.btn-login {
+    padding: 12px 25px;
+    background: #E8E8FC;
+    color: #6c5ce7;
+    border: 2px solid #a29bfe;
+    border-radius: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-login:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(162, 155, 254, 0.6);
+}
+
+.btn-register {
+    padding: 12px 25px;
+    background: #E8FDF8;
+    color: #00b894;
+    border: 2px solid #55EFC4;
+    border-radius: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-register:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(85, 239, 196, 0.6);
+}
+
+.btn-portfolio {
+    padding: 12px 25px;
+    background: #FFEAEA;
+    color: #e74c3c;
+    border: 2px solid #ff7675;
+    border-radius: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-portfolio:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(255, 118, 117, 0.6);
 }
 
 .btn-som {

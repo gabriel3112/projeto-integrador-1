@@ -86,6 +86,11 @@
           ✍️ Registrar
         </button>
 
+        <!-- Botão do Portfólio da Psicóloga -->
+        <button class="btn-portfolio" onclick="window.location.href='portfolio.html'" title="Portfólio da Psicóloga">
+          🧠 Portfólio
+        </button>
+        
         <!-- Botão para exibir a tela de Créditos dos desenvolvedores e instituição -->
         <button class="btn-creditos" onclick="window.location.href='creditos.html'">
           ℹ️ Créditos
@@ -133,8 +138,8 @@
         <input id="reg-email" placeholder="E-mail" style="padding:8px;border:1px solid #dfe6e9;border-radius:8px;" />
       </div>
       <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:12px;">
-        <button id="reg-cancel" style="padding:8px 12px; border-radius:8px; border:1px solid #dfe6e9; background:white;">Cancelar</button>
-        <button id="reg-save" style="padding:8px 12px; border-radius:8px; border:1px solid #6c5ce7; background:#6c5ce7; color:white;">Salvar & Entrar</button>
+        <button id="reg-cancel" style="padding:8px 12px; border-radius:8px; border:1px solid #dfe6e9; background:white; cursor:pointer; transition:transform 0.1s;" onmouseover="this.style.background='#f1f2f6'" onmouseout="this.style.background='white'" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'">Cancelar</button>
+        <button id="reg-save" style="padding:8px 12px; border-radius:8px; border:1px solid #6c5ce7; background:#6c5ce7; color:white; cursor:pointer; font-weight:bold; transition:transform 0.1s;" onmouseover="this.style.background='#5b4dbd'" onmouseout="this.style.background='#6c5ce7'" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'">Salvar & Entrar</button>
       </div>
     </div>
   </div>

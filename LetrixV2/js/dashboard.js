@@ -39,7 +39,13 @@ const DEFAULT_STATS = {
  * @returns {object} Objeto com dados do progresso da criança
  */
 function getStats(username) {
-  username = username || window.CURRENT_USER || null;
+  if (!username) {
+    try {
+      username = window.CURRENT_USER || localStorage.getItem('letrix_user') || null;
+    } catch (e) {
+      username = window.CURRENT_USER || null;
+    }
+  }
   const key = username ? `${STORAGE_KEY_STATS}_${username}` : STORAGE_KEY_STATS;
   const data = localStorage.getItem(key);
   // Se for o primeiro acesso, clona e retorna a estrutura padrão inicial
@@ -65,7 +71,13 @@ function getStats(username) {
  * @param {object} stats - Objeto de estatísticas atualizado
  */
 function saveStats(stats, username) {
-  username = username || window.CURRENT_USER || null;
+  if (!username) {
+    try {
+      username = window.CURRENT_USER || localStorage.getItem('letrix_user') || null;
+    } catch (e) {
+      username = window.CURRENT_USER || null;
+    }
+  }
   const key = username ? `${STORAGE_KEY_STATS}_${username}` : STORAGE_KEY_STATS;
   localStorage.setItem(key, JSON.stringify(stats));
 }
@@ -74,7 +86,13 @@ function saveStats(stats, username) {
  * Apaga e redefine todas as métricas para o valor padrão (reinício de progresso)
  */
 function resetStats(username) {
-  username = username || window.CURRENT_USER || null;
+  if (!username) {
+    try {
+      username = window.CURRENT_USER || localStorage.getItem('letrix_user') || null;
+    } catch (e) {
+      username = window.CURRENT_USER || null;
+    }
+  }
   saveStats(DEFAULT_STATS, username);
   // Atualiza dinamicamente o painel caso a tela do dashboard esteja aberta
   if (typeof updateDashboardUI === 'function') {
