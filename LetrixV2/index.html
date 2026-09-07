@@ -6,9 +6,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Letrix – Aprenda palavras brincando!</title>
   
-  <!-- Vinculação do Manifesto Web PWA para o instalador e PWABuilder -->
+  <!-- Vinculação do Manifesto Web PWA e Metadados para Aplicativo Móvel/Desktop -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#6c5ce7">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Letrix">
+  <link rel="apple-touch-icon" href="assets/icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
   
   <!-- Importação de fontes do Google Fonts (Fredoka One e Nunito) para visual lúdico -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -100,24 +106,19 @@
         <button class="btn-som" id="btn-som" onclick="toggleMusica()">
           🔇
         </button>
+
+        <!-- Botão para instalação do PWA em dispositivos móveis e desktop -->
+        <button class="btn-install-pwa" id="btn-install-pwa" style="display:none;" title="Instalar aplicativo Letrix">
+          📲 Instalar App
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- Inclusão do Gerenciador de Áudio Persistente -->
+  <!-- Inclusão do Gerenciador de Áudio, Banco de Dados e Gerenciador de PWA -->
   <script src="js/audio.js"></script>
   <script src="js/db.js"></script>
-
-  <!-- Registro de Service Worker para habilitar recursos de PWA e Cache offline -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-          .then((reg) => console.log('PWA Service Worker registrado no escopo:', reg.scope))
-          .catch((err) => console.error('Falha ao registrar Service Worker do PWA:', err));
-      });
-    }
-  </script>
+  <script src="js/pwa.js"></script>
 
   <!-- Registration Modal -->
   <div id="register-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">

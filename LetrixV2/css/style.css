@@ -286,3 +286,198 @@ body { font-family: 'Nunito', sans-serif; background: #FFF9EC; min-height: 100vh
     color: white;
     box-shadow: 0 6px 20px rgba(255, 142, 83, 0.4);
 }
+
+/* ==========================================
+   ESTILOS PWA (PROGRESSIVE WEB APP)
+   ========================================== */
+
+/* Botão principal de Instalação PWA */
+.btn-install-pwa {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #00b894, #00cec9);
+  color: white;
+  font-family: 'Fredoka One', cursive;
+  font-size: 15px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 5px 0 #00896f;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.btn-install-pwa:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 15px rgba(0, 206, 201, 0.4);
+}
+
+.btn-install-pwa:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #00896f;
+}
+
+/* Banner de Instalação Flutuante no Rodapé */
+.pwa-install-banner {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 440px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 12px 35px rgba(0,0,0,0.18);
+  border: 2px solid #6c5ce7;
+  padding: 12px 16px;
+  z-index: 9999;
+  animation: slide-up-pwa 0.5s ease-out;
+}
+
+@keyframes slide-up-pwa {
+  from { transform: translate(-50%, 100px); opacity: 0; }
+  to { transform: translate(-50%, 0); opacity: 1; }
+}
+
+.pwa-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pwa-banner-icon {
+  font-size: 28px;
+}
+
+.pwa-banner-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.pwa-banner-text strong {
+  font-family: 'Fredoka One', cursive;
+  color: #2d3436;
+  font-size: 15px;
+}
+
+.pwa-banner-text small {
+  color: #636e72;
+  font-size: 12px;
+}
+
+.pwa-btn-banner {
+  background: #6c5ce7;
+  color: white;
+  border: none;
+  font-family: 'Fredoka One', cursive;
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.pwa-btn-banner:hover {
+  background: #5b4dbd;
+}
+
+.pwa-btn-close {
+  background: transparent;
+  border: none;
+  color: #b2bec3;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+/* Toast de Notificação PWA (Offline/Online) */
+.pwa-toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translate(-50%, -100px);
+  background: #2d3436;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 30px;
+  font-weight: 700;
+  font-size: 14px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+  z-index: 10000;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.4s ease;
+  text-align: center;
+  max-width: 90%;
+}
+
+.pwa-toast.show {
+  transform: translate(-50%, 0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Modal de Instrução de Instalação no iOS Safari */
+.pwa-ios-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 10001;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.pwa-ios-content {
+  background: white;
+  border-radius: 24px;
+  max-width: 380px;
+  width: 100%;
+  padding: 24px;
+  position: relative;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.3);
+  text-align: center;
+}
+
+.pwa-ios-close {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  color: #b2bec3;
+  cursor: pointer;
+}
+
+.pwa-ios-icon {
+  font-size: 40px;
+  margin-bottom: 8px;
+}
+
+.pwa-ios-content h3 {
+  font-family: 'Fredoka One', cursive;
+  color: #6c5ce7;
+  margin-bottom: 12px;
+}
+
+.pwa-ios-content ol {
+  text-align: left;
+  margin: 12px 0 20px 20px;
+  color: #2d3436;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.pwa-ios-btn-ok {
+  background: #6c5ce7;
+  color: white;
+  border: none;
+  font-family: 'Fredoka One', cursive;
+  padding: 10px 24px;
+  border-radius: 12px;
+  font-size: 15px;
+  cursor: pointer;
+  width: 100%;
+}

@@ -6,10 +6,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <title>Letrix – Jogo de Coordenação</title>
   
+  <!-- Vinculação do Manifesto Web PWA e Metadados para Aplicativo Móvel/Desktop -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#6c5ce7">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Letrix">
+  <link rel="apple-touch-icon" href="assets/icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
+  
   <!-- Fontes lúdicas -->
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800&display=swap" rel="stylesheet" />
   
-  <!-- CSS específico da mecânica de arrasto do labirinto -->
+  <!-- Estilos globais PWA e específicos da mecânica de arrasto do labirinto -->
+  <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/drag.css" />
 </head>
 <body>
@@ -81,10 +92,11 @@
   <!-- Botão de mute/unmute do som de fundo -->
   <button class="btn-som" id="btn-som" onclick="toggleMusica()">🔇</button>
 
-  <!-- Dependências JavaScript -->
+  <!-- Dependências JavaScript e Gerenciador PWA -->
   <script src="js/audio.js"></script>      <!-- Controle de som persistente -->
   <script src="js/dashboard.js"></script>  <!-- Métricas de colisão e tempo para o dashboard -->
   <script src="js/db.js"></script>         <!-- Banco de dados IndexedDB -->
   <script src="js/game-drag.js"></script>   <!-- Lógica física de colisão e arrasto do labirinto -->
+  <script src="js/pwa.js"></script>         <!-- Suporte a PWA e offline -->
 </body>
 </html>

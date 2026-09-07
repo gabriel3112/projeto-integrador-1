@@ -6,11 +6,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Letrix – Jogo de Memória</title>
   
+  <!-- Vinculação do Manifesto Web PWA e Metadados para Aplicativo Móvel/Desktop -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#6c5ce7">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Letrix">
+  <link rel="apple-touch-icon" href="assets/icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
+  
   <!-- Importação de fontes lúdicas do Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
   
-  <!-- CSS de animação de cartas e grid do jogo de memória -->
+  <!-- Estilos globais PWA e animação de cartas/grid do jogo de memória -->
+  <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/memoria.css">
 </head>
 <body>
@@ -83,11 +94,12 @@
   <!-- Controle de volume / botão mute flutuante -->
   <button class="btn-som" id="btn-som" onclick="toggleMusica()">🔇</button>
 
-  <!-- Dependências JavaScript -->
+  <!-- Dependências JavaScript e Gerenciador PWA -->
   <script src="js/audio.js"></script>          <!-- Áudio global persistente -->
   <script src="js/dashboard.js"></script>      <!-- Registro de métricas de movimentos e vitórias -->
   <script src="js/db.js"></script>             <!-- Banco de dados IndexedDB -->
   <script src="js/palavras.js"></script>       <!-- Base de dados de palavras -->
   <script src="js/game-memoria.js"></script>   <!-- Mecânica de embaralhamento, viradas e matching de cartas -->
+  <script src="js/pwa.js"></script>            <!-- Suporte a PWA e offline -->
 </body>
 </html>

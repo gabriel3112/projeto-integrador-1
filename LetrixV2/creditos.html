@@ -1,9 +1,24 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <!-- Metadados de codificação -->
+  <!-- Metadados de codificação e viewport -->
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Créditos - Letrix</title>
+
+  <!-- Vinculação do Manifesto Web PWA e Metadados para Aplicativo Móvel/Desktop -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#6c5ce7">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Letrix">
+  <link rel="apple-touch-icon" href="assets/icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  
   <!-- Folha de estilo padrão -->
   <link rel="stylesheet" href="css/style.css">
 </head>
@@ -39,9 +54,9 @@
       a aprenderem palavras de forma divertida e interativa.
     </p>
 
-    <!-- Tecnologias utilizadas (academicamente relevantes) -->
+    <!-- Tecnologias utilizadas -->
     <h2>Tecnologias usadas</h2>
-    <p>HTML, CSS e JavaScript</p>
+    <p>HTML5, CSS3, JavaScript (ES6+), PWA (Service Workers, Cache API, Web App Manifest), IndexedDB</p>
 
     <!-- Instituição vinculada -->
     <h2>Instituição</h2>
@@ -60,7 +75,8 @@
   <!-- Botão de som / mute -->
   <button class="btn-som" id="btn-som" onclick="toggleMusica()">🔇</button>
   
-  <!-- Script de áudio persistente -->
+  <!-- Scripts -->
   <script src="js/audio.js"></script>
+  <script src="js/pwa.js"></script>
 </body>
 </html>

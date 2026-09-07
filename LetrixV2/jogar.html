@@ -6,11 +6,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Letrix – Jogar</title>
   
+  <!-- Vinculação do Manifesto Web PWA e Metadados para Aplicativo Móvel/Desktop -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#6c5ce7">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Letrix">
+  <link rel="apple-touch-icon" href="assets/icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
+  
   <!-- Fontes importadas para o visual lúdico infantil -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
   
-  <!-- CSS específico da jogabilidade Letrix Palavras -->
+  <!-- Estilos globais PWA e específicos da jogabilidade Letrix Palavras -->
+  <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/jogar.css">
 </head>
 <body>
@@ -106,11 +117,12 @@
   <!-- Botão flutuante de mute/unmute do áudio no canto inferior direito -->
   <button class="btn-som" id="btn-som" onclick="toggleMusica()">🔇</button>
 
-  <!-- Dependências JavaScript do jogo -->
+  <!-- Dependências JavaScript do jogo e Gerenciador PWA -->
   <script src="js/audio.js"></script>          <!-- Gerencia áudio persistente -->
   <script src="js/dashboard.js"></script>      <!-- Registra métricas pedagógicas -->
   <script src="js/db.js"></script>             <!-- Banco de dados IndexedDB -->
   <script src="js/palavras.js"></script>       <!-- Banco de dados de palavras -->
   <script src="js/game-palavras.js"></script>  <!-- Lógica da mecânica de spelling -->
+  <script src="js/pwa.js"></script>            <!-- Suporte a PWA e offline -->
 </body>
 </html>
