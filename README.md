@@ -2,7 +2,7 @@
 
 > **Projeto Integrador / Trabalho de Conclusão de Curso**  
 > **Curso**: Análise e Desenvolvimento de Sistemas (ADS) – CEUB  
-> **Desenvolvedores**: Gabriel Matheus Silva Souza e Davi Arthur Altino De Souza  
+> **Desenvolvedores**: Gabriel Matheus Silva Souza, Davi Arthur Altino De Souza e Vinicius Bernardo Vieira  
 
 O **Letrix** é uma solução pedagógica e lúdica desenvolvida como **Progressive Web App (PWA)** com suporte a funcionamento offline e integração com API backend Node.js e banco de dados MySQL. O projeto auxilia crianças no processo de alfabetização, treino de coordenação motora fina e exercícios de memória visual.
 
