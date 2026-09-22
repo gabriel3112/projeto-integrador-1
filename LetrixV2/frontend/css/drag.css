@@ -121,7 +121,7 @@ body {
   box-shadow: 0 8px 36px var(--shadow);
   overflow: hidden;
   touch-action: none;
-  cursor: none; /* esconde cursor padrão durante drag */
+  cursor: default; /* exibe o ponteiro do mouse visível no painel do jogo */
 }
 #path-svg {
   display: block;

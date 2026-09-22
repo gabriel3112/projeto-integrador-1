@@ -76,6 +76,14 @@ function salvarPartida(partida) {
       const request = store.add(partida);
 
       request.onsuccess = (event) => {
+        // Tenta sincronizar o resultado com o servidor backend MySQL
+        if (typeof salvarResultadoAPI === 'function') {
+          const nomeUser = partida.user || 'Convidado';
+          const nomeJogo = partida.jogo || 'Letrix';
+          const pontuacao = typeof partida.pontos === 'number' ? partida.pontos : (partida.resultado === 'Vitória' || partida.resultado === 'Ganhou' ? 100 : 0);
+          const duracao = partida.tempo || partida.tempoSec || 0;
+          salvarResultadoAPI(nomeUser, nomeJogo, pontuacao, duracao);
+        }
         resolve(event.target.result); // Retorna o ID auto-incremental do registro inserido
       };
 

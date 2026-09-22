@@ -1,3 +1,5 @@
+-- Script DDL para criação do Banco de Dados LETRIX e tabela de resultados
+
 CREATE DATABASE IF NOT EXISTS LETRIX;
 USE LETRIX;
 

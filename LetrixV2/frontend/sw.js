@@ -1,14 +1,13 @@
 /**
- * LETRIX – Service Worker para funcionamento offline completo (PWA)
+ * LETRIX – Service Worker para funcionamento offline (PWA)
  * 
- * Este script faz o cacheamento automático de todas as páginas, estilos, scripts e mídias.
- * Isso garante que o aplicativo continue funcionando perfeitamente mesmo que o dispositivo
- * esteja totalmente desconectado da internet.
+ * Este script realiza o pré-cacheamento dos recursos essenciais da interface (HTML, CSS, JS e mídias),
+ * garantindo que o aplicativo continue acessível e funcional mesmo sem conexão de internet.
  */
 
-const CACHE_NAME = 'letrix-v2-pwa-v5';
+const CACHE_NAME = 'letrix-v2-frontend-v1';
 
-// Lista completa de arquivos estáticos a serem cacheados na instalação
+// Lista de arquivos estáticos a serem cacheados na instalação
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -24,6 +23,7 @@ const ASSETS_TO_CACHE = [
   './css/drag.css',
   './css/memoria.css',
   './css/portfolio.css',
+  './js/config.js',
   './js/audio.js',
   './js/dashboard.js',
   './js/db.js',
@@ -31,7 +31,6 @@ const ASSETS_TO_CACHE = [
   './js/game-palavras.js',
   './js/game-drag.js',
   './js/game-memoria.js',
-  './js/pwa.js',
   './assets/lion_mascot.png',
   './assets/psychologist.png',
   './assets/office_1.jpg',
@@ -41,28 +40,17 @@ const ASSETS_TO_CACHE = [
   './assets/icon-512.png'
 ];
 
-// Evento de Instalação: armazena todos os arquivos estáticos necessários no cache
+// Evento de Instalação: armazena recursos estáticos no cache do navegador
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(async (cache) => {
-      console.log('[Service Worker] Cacheando todos os recursos do Letrix PWA...');
-      try {
-        await cache.addAll(ASSETS_TO_CACHE);
-      } catch (err) {
-        console.warn('[Service Worker] Erro ao cachear lote inicial, salvando recurso por recurso:', err);
-        for (const asset of ASSETS_TO_CACHE) {
-          try {
-            await cache.add(asset);
-          } catch (e) {
-            console.error('[Service Worker] Não foi possível cachear:', asset, e);
-          }
-        }
-      }
+    caches.open(CACHE_NAME).then((cache) => {
+      console.log('[Service Worker] Cacheando recursos do frontend');
+      return cache.addAll(ASSETS_TO_CACHE);
     }).then(() => self.skipWaiting())
   );
 });
 
-// Evento de Ativação: remove caches desatualizados
+// Evento de Ativação: limpa versões desatualizadas do cache
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -78,9 +66,10 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Evento Fetch: intercepta requisições de rede (Cache First com fallback de rede e navegação)
+// Evento Fetch: intercepta requisições de rede (Cache First)
 self.addEventListener('fetch', (event) => {
-  if (event.request.method !== 'GET') return;
+  // Ignora chamadas para a API REST backend (que devem ser trafegadas na rede)
+  if (event.request.url.includes('/api/')) return;
   if (!event.request.url.startsWith(self.location.origin)) return;
 
   event.respondWith(
@@ -97,16 +86,9 @@ self.addEventListener('fetch', (event) => {
           });
         }
         return networkResponse;
-      }).catch(async (err) => {
-        console.warn('[Service Worker] Falha ao buscar recurso offline:', event.request.url);
-        // Se for requisição de navegação HTML e falhar, abre index.html do cache
-        if (event.request.mode === 'navigate') {
-          const mainPage = await caches.match('./index.html');
-          if (mainPage) return mainPage;
-        }
-        throw err;
+      }).catch(() => {
+        console.warn('[Service Worker] Recurso indisponível offline:', event.request.url);
       });
     })
   );
 });
-

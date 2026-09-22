@@ -147,6 +147,8 @@ function vbToPx(vbX, vbY) {
  * Cria as bandeiras de Início, Fim e o Foguete nas posições correspondentes do labirinto
  */
 function placeZones(points) {
+  if (!arena) return;
+
   // Limpa elementos de zonas anteriores
   document.querySelectorAll('.zone, #draggable').forEach(e => e.remove());
 
@@ -175,14 +177,20 @@ function placeZones(points) {
   // Foguete Arrastável (🚀)
   const drag = document.createElement('div');
   drag.id = 'draggable';
+  drag.setAttribute('draggable', 'true');
   drag.textContent = '🚀';
   drag.style.left = (ps.x - 22) + 'px';
   drag.style.top  = (ps.y - 22) + 'px';
+  drag.style.cursor = 'grab';
   arena.appendChild(drag);
 
-  // Associa eventos de arrastar para mouse e toques de tela (mobile)
+  // Evita interrupções do drag-and-drop nativo do navegador
+  drag.addEventListener('dragstart', (e) => e.preventDefault());
+
+  // Associa eventos de arrastar para mouse, toques de tela e ponteiros (mobile e desktop)
   drag.addEventListener('mousedown', onDragStart);
   drag.addEventListener('touchstart', onDragStart, { passive: false });
+  drag.addEventListener('pointerdown', onDragStart);
 }
 
 // --------------------------------------------------
@@ -192,8 +200,11 @@ function placeZones(points) {
 function pointToSegmentDist(px, py, ax, ay, bx, by) {
   const abx = bx - ax, aby = by - ay;
   const apx = px - ax, apy = py - ay;
+  const lenSq = abx * abx + aby * aby;
+  if (lenSq === 0) return Math.sqrt(apx * apx + apy * apy);
+
   // Calcula a projeção do ponto no segmento
-  const t = Math.max(0, Math.min(1, (apx*abx + apy*aby) / (abx*abx + aby*aby)));
+  const t = Math.max(0, Math.min(1, (apx*abx + apy*aby) / lenSq));
   const dx = px - (ax + t*abx);
   const dy = py - (ay + t*aby);
   return Math.sqrt(dx*dx + dy*dy); // Distância real
@@ -203,21 +214,24 @@ function pointToSegmentDist(px, py, ax, ay, bx, by) {
  * Retorna true se a coordenada do foguete está no corredor navegável do nível
  */
 function isInsidePath(cx, cy) {
+  if (!arena) return false;
   const rect = arena.getBoundingClientRect();
+  if (rect.width === 0 || rect.height === 0) return true;
+
   // Converte pixel do DOM de volta para o sistema de coordenadas do SVG viewBox (488x360)
   const scaleX = 488 / rect.width;
   const scaleY = 360 / rect.height;
   const vx = cx * scaleX;
   const vy = cy * scaleY;
 
-  const lv  = LEVELS[currentLevel];
+  const lv  = LEVELS[currentLevel] || LEVELS[0];
   const pts = lv.points;
-  const halfGap = lv.gap / 2;
+  const halfGap = (lv.gap / 2) + 3; // Margem de tolerância suave para precisão e fluidez no toque/mouse
 
   // Verifica se o ponto está a uma distância menor do que a metade da largura do caminho em qualquer segmento
   for (let i = 0; i < pts.length - 1; i++) {
     const d = pointToSegmentDist(vx, vy, pts[i].x, pts[i].y, pts[i+1].x, pts[i+1].y);
-    if (d <= halfGap) return true;
+    if (!isNaN(d) && d <= halfGap) return true;
   }
   return false; // Fora do caminho (colidiu)
 }
@@ -226,7 +240,7 @@ function isInsidePath(cx, cy) {
  * Retorna true se o foguete alcançou a estrela final
  */
 function isAtEnd(cx, cy) {
-  const lv  = LEVELS[currentLevel];
+  const lv  = LEVELS[currentLevel] || LEVELS[0];
   const end = lv.points[lv.points.length - 1];
   const pe  = vbToPx(end.x, end.y);
   const dx  = cx - pe.x, dy = cy - pe.y;
@@ -242,26 +256,31 @@ function isAtEnd(cx, cy) {
  */
 function onDragStart(e) {
   if (!gameActive) return;
-  e.preventDefault();
+  if (e && e.cancelable) e.preventDefault();
+
+  const drag = document.getElementById('draggable');
+  if (!drag) return;
 
   isDragging = true;
-  const drag = document.getElementById('draggable');
   drag.classList.add('dragging'); // Escala levemente o foguete
+  drag.style.cursor = 'grabbing';
 
-  // Coordenada absoluta de clique/toque
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  // Coordenada absoluta de clique/toque/pointer
+  const clientX = (e.touches && e.touches.length > 0) ? e.touches[0].clientX : (e.clientX !== undefined ? e.clientX : 0);
+  const clientY = (e.touches && e.touches.length > 0) ? e.touches[0].clientY : (e.clientY !== undefined ? e.clientY : 0);
   const rect = drag.getBoundingClientRect();
   
-  // Mantém a posição relativa onde o ponteiro tocou dentro do círculo para evitar pulos
-  dragOffX = clientX - rect.left - 22;
-  dragOffY = clientY - rect.top  - 22;
+  // Offset exato em relação à borda superior/esquerda do elemento para evitar saltos indevidos
+  dragOffX = clientX - rect.left;
+  dragOffY = clientY - rect.top;
 
   // Escuta movimentos em nível de janela (document) para evitar perda de foco rápido
   document.addEventListener('mousemove', onDragMove);
   document.addEventListener('mouseup',   onDragEnd);
   document.addEventListener('touchmove', onDragMove, { passive: false });
   document.addEventListener('touchend',  onDragEnd);
+  document.addEventListener('pointermove', onDragMove);
+  document.addEventListener('pointerup',   onDragEnd);
 }
 
 /**
@@ -269,14 +288,16 @@ function onDragStart(e) {
  */
 function onDragMove(e) {
   if (!isDragging) return;
-  e.preventDefault();
+  if (e && e.cancelable) e.preventDefault();
 
   const drag = document.getElementById('draggable');
-  const arenaRect = arena.getBoundingClientRect();
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  if (!drag || !arena) return;
 
-  // Novas posições baseadas no mouse/dedo e offset de clique
+  const arenaRect = arena.getBoundingClientRect();
+  const clientX = (e.touches && e.touches.length > 0) ? e.touches[0].clientX : (e.clientX !== undefined ? e.clientX : 0);
+  const clientY = (e.touches && e.touches.length > 0) ? e.touches[0].clientY : (e.clientY !== undefined ? e.clientY : 0);
+
+  // Novas posições baseadas na arena e no offset exato de clique
   let newLeft = clientX - arenaRect.left - dragOffX;
   let newTop  = clientY - arenaRect.top  - dragOffY;
 
@@ -290,35 +311,110 @@ function onDragMove(e) {
   // Obtém o centro do foguete para cálculos matemáticos
   const cx = newLeft + 22, cy = newTop + 22;
 
-  // 1. Detecção de Colisão com as paredes roxas
-  if (!isInsidePath(cx, cy)) {
-    onHitWall();
-    return;
+  // FASES 1 E 2: Valida colisão de paredes durante a movimentação
+  if (currentLevel < 2) {
+    if (!isInsidePath(cx, cy)) {
+      onHitWall();
+      return;
+    }
   }
 
-  // 2. Detecção de Chegada à estrela final
+  // FASE 3 E DEMAIS: Checa se alcançou o alvo durante a movimentação
   if (isAtEnd(cx, cy)) {
     onWin();
   }
 }
 
 /**
- * Solta o arrasto e limpa os listeners temporários da tela
+ * Solta o arrasto e limpa os listeners temporários da tela com validação da Drop Zone na Fase 3
  */
 function onDragEnd(e) {
   if (!isDragging) return;
   isDragging = false;
   const drag = document.getElementById('draggable');
-  if (drag) drag.classList.remove('dragging');
+  if (drag) {
+    drag.classList.remove('dragging');
+    drag.style.cursor = 'grab';
+  }
   document.removeEventListener('mousemove', onDragMove);
   document.removeEventListener('mouseup',   onDragEnd);
   document.removeEventListener('touchmove', onDragMove);
   document.removeEventListener('touchend',  onDragEnd);
+  document.removeEventListener('pointermove', onDragMove);
+  document.removeEventListener('pointerup',   onDragEnd);
+
+  // Validação ao Soltar (Drop Zone) exclusiva para a Fase 3
+  if (gameActive && currentLevel === 2 && drag) {
+    const dragRect = drag.getBoundingClientRect();
+    const dragCenter = {
+      x: dragRect.left + dragRect.width / 2,
+      y: dragRect.top  + dragRect.height / 2
+    };
+
+    const zEnd = document.getElementById('zone-end');
+    let isTarget = false;
+
+    if (zEnd) {
+      const endRect = zEnd.getBoundingClientRect();
+      if (
+        dragCenter.x >= endRect.left &&
+        dragCenter.x <= endRect.right &&
+        dragCenter.y >= endRect.top &&
+        dragCenter.y <= endRect.bottom
+      ) {
+        isTarget = true;
+      } else {
+        const elemAtPoint = document.elementFromPoint(dragCenter.x, dragCenter.y);
+        if (elemAtPoint && (elemAtPoint.id === 'zone-end' || elemAtPoint.closest('#zone-end'))) {
+          isTarget = true;
+        }
+      }
+    }
+
+    const arenaRect = arena.getBoundingClientRect();
+    const cx = dragRect.left + 22 - arenaRect.left;
+    const cy = dragRect.top  + 22 - arenaRect.top;
+
+    if (isTarget || isAtEnd(cx, cy)) {
+      onWin();
+    } else {
+      // Soltou fora do alvo na Fase 3: aplica penalidade e retorna à largada
+      onHitWall();
+    }
+  }
 }
 
 // --------------------------------------------------
 // CONSEQUÊNCIAS DE COLISÃO E VITÓRIA
 // --------------------------------------------------
+
+/**
+ * Função de encerramento da partida (registra dados do paciente e pontuação)
+ */
+function finalizarPartida(nome_paciente, pontuacao, duracao_segundos) {
+  const patientName = nome_paciente || (localStorage.getItem('letrix_user') || 'Convidado');
+  const score = pontuacao !== undefined ? pontuacao : 100;
+  const duration = duracao_segundos !== undefined ? duracao_segundos : (LEVELS[currentLevel].timeSec - timerSec);
+
+  if (typeof trackDragAttempt === 'function') {
+    trackDragAttempt(true, levelWallHits, duration);
+  }
+
+  if (typeof salvarPartida === 'function') {
+    salvarPartida({
+      user: patientName,
+      jogo: 'Letrix Arrastar',
+      resultado: 'Vitória',
+      pontos: score,
+      tempo: duration,
+      detalhes: `Dificuldade: ${LEVELS[currentLevel].name} | Batidas na parede: ${levelWallHits}`
+    });
+  }
+
+  if (typeof salvarResultadoAPI === 'function') {
+    salvarResultadoAPI(patientName, 'Letrix Arrastar', score, duration);
+  }
+}
 
 /**
  * Acionado ao colidir com as paredes roxas
@@ -332,13 +428,13 @@ function onHitWall() {
   livesEl.textContent = lives;
 
   const drag = document.getElementById('draggable');
-  drag.classList.add('error'); // Vibração e piscar vermelho por CSS
+  if (drag) drag.classList.add('error'); // Vibração e piscar vermelho por CSS
 
   // Aciona vibração nativa do celular (se compatível)
   if (navigator.vibrate) navigator.vibrate(200);
 
   setTimeout(() => {
-    drag.classList.remove('error');
+    if (drag) drag.classList.remove('error');
     resetDraggable(); // Retorna o foguete para a largada
 
     if (lives <= 0) {
@@ -357,24 +453,14 @@ function onWin() {
   onDragEnd();
 
   const drag = document.getElementById('draggable');
-  drag.classList.add('win'); // Efeito CSS de giro e sucesso verde
+  if (drag) drag.classList.add('win'); // Efeito CSS de giro e sucesso verde
 
-  // Registra a vitória no Dashboard do Portal Pedagógico
-  if (typeof trackDragAttempt === 'function') {
-    const timeTaken = LEVELS[currentLevel].timeSec - timerSec;
-    trackDragAttempt(true, levelWallHits, timeTaken);
-  }
+  const timeTaken = LEVELS[currentLevel].timeSec - timerSec;
+  const patientName = localStorage.getItem('letrix_user') || 'Convidado';
+  const finalScore = Math.max(100 - (levelWallHits * 10), 10);
 
-  // Registra a partida jogada com vitória no banco de dados IndexedDB
-  if (typeof salvarPartida === 'function') {
-    const timeTaken = LEVELS[currentLevel].timeSec - timerSec;
-    salvarPartida({
-      jogo: 'Letrix Arrastar',
-      resultado: 'Vitória',
-      tempo: timeTaken,
-      detalhes: `Dificuldade: ${LEVELS[currentLevel].name} | Batidas na parede: ${levelWallHits}`
-    });
-  }
+  // Registra e finaliza a partida com os dados do paciente e a pontuação
+  finalizarPartida(patientName, finalScore, timeTaken);
 
   setTimeout(() => {
     launchConfetti(); // Confetes
@@ -469,7 +555,8 @@ function showOverlay(win) {
 function resetDraggable() {
   const drag = document.getElementById('draggable');
   if (!drag) return;
-  const start = LEVELS[currentLevel].points[0];
+  const lv = LEVELS[currentLevel] || LEVELS[0];
+  const start = lv.points[0];
   const ps = vbToPx(start.x, start.y);
   drag.style.left = (ps.x - 22) + 'px';
   drag.style.top  = (ps.y - 22) + 'px';
@@ -480,7 +567,7 @@ function resetDraggable() {
 // --------------------------------------------------
 function initGame() {
   overlay.classList.remove('show');
-  const lv = LEVELS[currentLevel];
+  const lv = LEVELS[currentLevel] || LEVELS[0];
 
   lives    = 3; // Inicializa corações
   levelWallHits = 0; // Reseta colisões do nível
@@ -496,7 +583,8 @@ function initGame() {
   // Reconstrói a pista SVG
   buildPath(lv.points, lv.gap);
 
-  // Aguarda frame de animação de tela para calcular as dimensões reais renderizadas
+  // Posiciona as zonas imediatamente e recalcula após animação do DOM
+  placeZones(lv.points);
   requestAnimationFrame(() => {
     placeZones(lv.points);
   });

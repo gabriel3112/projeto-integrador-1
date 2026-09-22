@@ -1,13 +1,16 @@
 {
   "name": "letrix-backend",
   "version": "1.0.0",
-  "description": "API Node.js/Express para salvar resultados de jogos do Letrix no MySQL",
+  "description": "API Node.js/Express para gerenciamento de resultados do jogo Letrix",
   "main": "server.js",
   "type": "commonjs",
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js"
   },
+  "keywords": ["letrix", "ads", "api", "express", "mysql2"],
+  "author": "Projeto Integrador Letrix",
+  "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
