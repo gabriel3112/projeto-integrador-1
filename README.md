@@ -31,7 +31,8 @@ LetrixV2/
     │   ├── db.js             # Persistência offline local (IndexedDB)
     │   ├── game-palavras.js  # Lógica do jogo Letrix Palavras
     │   ├── game-drag.js      # Lógica do jogo Letrix Arrastar (labirinto)
-    │   └── game-memoria.js   # Lógica do jogo Letrix Memória
+    │   ├── game-memoria.js   # Lógica do jogo Letrix Memória
+    │   └── pwa.js            # Gerenciador de PWA, offline e download/instalação
     ├── creditos.html         # Informações do projeto e autores
     ├── dashboard.html        # Painel Pedagógico de desempenho
     ├── drag.html             # Tela do jogo de coordenação

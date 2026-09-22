@@ -1,13 +1,13 @@
 /**
  * LETRIX – Service Worker para funcionamento offline (PWA)
  * 
- * Este script realiza o pré-cacheamento dos recursos essenciais da interface (HTML, CSS, JS e mídias),
- * garantindo que o aplicativo continue acessível e funcional mesmo sem conexão de internet.
+ * Realiza o pré-cacheamento dos recursos essenciais da interface (HTML, CSS, JS e mídias),
+ * permitindo o funcionamento 100% offline e instalação nativa da aplicação.
  */
 
-const CACHE_NAME = 'letrix-v2-frontend-v1';
+const CACHE_NAME = 'letrix-pwa-v2';
 
-// Lista de arquivos estáticos a serem cacheados na instalação
+// Lista de arquivos estáticos a serem pré-cacheados na instalação
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -31,6 +31,7 @@ const ASSETS_TO_CACHE = [
   './js/game-palavras.js',
   './js/game-drag.js',
   './js/game-memoria.js',
+  './js/pwa.js',
   './assets/lion_mascot.png',
   './assets/psychologist.png',
   './assets/office_1.jpg',
@@ -40,17 +41,26 @@ const ASSETS_TO_CACHE = [
   './assets/icon-512.png'
 ];
 
-// Evento de Instalação: armazena recursos estáticos no cache do navegador
+// Evento de Instalação: armazena recursos no cache do navegador de forma resiliente
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      console.log('[Service Worker] Cacheando recursos do frontend');
-      return cache.addAll(ASSETS_TO_CACHE);
+    caches.open(CACHE_NAME).then(async (cache) => {
+      console.log('[Service Worker] Cacheando recursos do Letrix PWA...');
+      // Faz o cacheamento individual para evitar que a falha de um único arquivo interrompa a instalação
+      await Promise.all(
+        ASSETS_TO_CACHE.map(async (url) => {
+          try {
+            await cache.add(url);
+          } catch (err) {
+            console.warn('[Service Worker] Aviso: Falha ao cachear item prévio:', url, err);
+          }
+        })
+      );
     }).then(() => self.skipWaiting())
   );
 });
 
-// Evento de Ativação: limpa versões desatualizadas do cache
+// Evento de Ativação: remove caches de versões antigas e assume o controle dos clientes
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -66,28 +76,58 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Evento Fetch: intercepta requisições de rede (Cache First)
+// Evento Fetch: intercepta requisições de rede com suporte offline inteligente
 self.addEventListener('fetch', (event) => {
-  // Ignora chamadas para a API REST backend (que devem ser trafegadas na rede)
-  if (event.request.url.includes('/api/')) return;
-  if (!event.request.url.startsWith(self.location.origin)) return;
+  const request = event.request;
 
+  // Ignora requisições para a API REST backend (devem ir para o servidor)
+  if (request.url.includes('/api/')) {
+    return;
+  }
+
+  // Apenas intercepta requisições HTTP/HTTPS da mesma origem
+  if (!request.url.startsWith(self.location.origin)) {
+    return;
+  }
+
+  // Requisições de navegação (HTML): tenta Cache First, depois Network, com fallback para index.html
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      caches.match(request).then((cachedResponse) => {
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+        return fetch(request).then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const responseToCache = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, responseToCache));
+          }
+          return networkResponse;
+        }).catch(() => {
+          return caches.match('./index.html') || caches.match('index.html');
+        });
+      })
+    );
+    return;
+  }
+
+  // Demais recursos (CSS, JS, Imagens, Fontes, Áudio): Cache First com fallback para Network
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
+    caches.match(request).then((cachedResponse) => {
       if (cachedResponse) {
         return cachedResponse;
       }
-      
-      return fetch(event.request).then((networkResponse) => {
+
+      return fetch(request).then((networkResponse) => {
         if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
           const responseToCache = networkResponse.clone();
           caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseToCache);
+            cache.put(request, responseToCache);
           });
         }
         return networkResponse;
-      }).catch(() => {
-        console.warn('[Service Worker] Recurso indisponível offline:', event.request.url);
+      }).catch((err) => {
+        console.warn('[Service Worker] Recurso indisponível offline:', request.url);
       });
     })
   );

@@ -2,21 +2,94 @@
   "name": "Letrix - Alfabetização Lúdica",
   "short_name": "Letrix",
   "description": "Um jogo educativo e divertido para crianças aprenderem palavras e desenvolverem a coordenação motora fina.",
-  "start_url": "index.html",
+  "id": "letrix-app",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
-  "orientation": "portrait",
+  "orientation": "any",
   "background_color": "#FFF9EC",
   "theme_color": "#6c5ce7",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "categories": [
+    "education",
+    "kids",
+    "games"
+  ],
   "icons": [
     {
       "src": "assets/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "assets/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Letrix Palavras",
+      "short_name": "Palavras",
+      "description": "Aprenda e monte palavras brincando",
+      "url": "./jogar.html",
+      "icons": [
+        {
+          "src": "assets/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Letrix Arrastar",
+      "short_name": "Arrastar",
+      "description": "Jogo de coordenação motora e labirinto",
+      "url": "./drag.html",
+      "icons": [
+        {
+          "src": "assets/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Letrix Memória",
+      "short_name": "Memória",
+      "description": "Treine sua memória e raciocínio",
+      "url": "./memoria.html",
+      "icons": [
+        {
+          "src": "assets/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Painel Pedagógico",
+      "short_name": "Painel",
+      "description": "Relatórios e métricas de desempenho",
+      "url": "./dashboard.html",
+      "icons": [
+        {
+          "src": "assets/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ]
 }

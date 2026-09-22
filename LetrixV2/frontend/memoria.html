@@ -10,6 +10,17 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
   
+  <!-- Metadados PWA & Mobile -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#6c5ce7">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Letrix">
+  <link rel="apple-touch-icon" href="assets/icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="assets/icon-512.png">
+  
   <!-- CSS de animação de cartas e grid do jogo de memória -->
   <link rel="stylesheet" href="css/memoria.css">
 </head>
@@ -90,5 +101,6 @@
   <script src="js/db.js"></script>             <!-- Banco de dados IndexedDB -->
   <script src="js/palavras.js"></script>       <!-- Base de dados de palavras -->
   <script src="js/game-memoria.js"></script>   <!-- Mecânica de embaralhamento, viradas e matching de cartas -->
+  <script src="js/pwa.js"></script>            <!-- PWA e Suporte Offline -->
 </body>
 </html>

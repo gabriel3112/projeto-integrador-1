@@ -6,9 +6,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Letrix – Aprenda palavras brincando!</title>
   
-  <!-- Vinculação do Manifesto Web PWA para o instalador e PWABuilder -->
+  <!-- Metadados PWA & Mobile -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#6c5ce7">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Letrix">
+  <link rel="apple-touch-icon" href="assets/icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="assets/icon-512.png">
   
   <!-- Importação de fontes do Google Fonts (Fredoka One e Nunito) para visual lúdico -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -71,6 +78,11 @@
 
       <!-- Fileira de botões secundários utilitários e de controle -->
       <div class="secondary-btns">
+        <!-- Botão para Baixar / Instalar o aplicativo PWA -->
+        <button class="btn-pwa-install" id="btn-pwa-install" title="Baixar e instalar o Letrix no celular ou computador">
+          <span class="btn-icon">📲</span> Baixar App
+        </button>
+
         <!-- Botão de acesso ao Painel Pedagógico de métricas educacionais (Dashboard) -->
         <button class="btn-dashboard" onclick="window.location.href='dashboard.html'">
           📊 Painel Pedagógico
@@ -104,21 +116,11 @@
     </div>
   </div>
 
-  <!-- Configuração Global da API e Gerenciador de Áudio -->
+  <!-- Configuração Global da API, Gerenciador de Áudio, Banco Offline e PWA -->
   <script src="js/config.js"></script>
   <script src="js/audio.js"></script>
   <script src="js/db.js"></script>
-
-  <!-- Registro de Service Worker para habilitar recursos de PWA e Cache offline -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-          .then((reg) => console.log('PWA Service Worker registrado no escopo:', reg.scope))
-          .catch((err) => console.error('Falha ao registrar Service Worker do PWA:', err));
-      });
-    }
-  </script>
+  <script src="js/pwa.js"></script>
 
   <!-- Registration Modal -->
   <div id="register-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
