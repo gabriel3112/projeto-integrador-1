@@ -39,82 +39,93 @@
     <span class="fl">E</span><span class="fl">Z</span><span class="fl">M</span><span class="fl">P</span>
   </div>
 
-  <!-- Área principal do menu (Hero Section) -->
-  <div class="hero">
-    <!-- Logotipo principal com letras coloridas individuais -->
-    <div class="logo-wrap">
-      <span class="logo-letter">L</span><span class="logo-letter">E</span><span class="logo-letter">T</span>
-      <span class="logo-letter">R</span><span class="logo-letter">I</span><span class="logo-letter">X</span>
-      <span class="logo-star">⭐</span>
-    </div>
+  <header class="topbar">
+    <nav class="nav-shell" aria-label="Menu principal">
+      <a class="brand" href="index.html" aria-label="Letrix inicial">
+        <span class="brand-word">
+          <span class="brand-color brand-red">L</span>
+          <span class="brand-color brand-orange">E</span>
+          <span class="brand-color brand-yellow">T</span>
+          <span class="brand-color brand-green">R</span>
+          <span class="brand-color brand-cyan">I</span>
+          <span class="brand-color brand-purple">X</span>
+        </span>
+        <span class="brand-star">⭐</span>
+      </a>
 
-    <!-- Slogan educativo do jogo -->
-    <p class="tagline">Aprenda palavras brincando!</p>
-
-    <!-- Card de exibição do Mascote (Leão gerado por IA para visual premium) -->
-    <div class="game-preview">
-      <img src="assets/lion_mascot.png" alt="Mascote Letrix" class="mascot-img-large">
-    </div>
-
-    <!-- Seção de Ações e Modos de Jogo -->
-    <div class="cta-area">
-      <!-- Grade contendo os 3 modos de jogo disponíveis -->
-      <div class="game-modes">
-        <!-- Botão para iniciar o jogo Letrix Palavras (Spelling) -->
-        <button class="btn-play" onclick="window.location.href='jogar.html'">
-          <span class="btn-icon">🔤</span> Letrix Palavras
-        </button>
-        
-        <!-- Botão para iniciar o jogo Letrix Arrastar (Coordenação Motora) -->
-        <button class="btn-play mode-drag" onclick="window.location.href='drag.html'">
-          <span class="btn-icon">🎯</span> Letrix Arrastar
-        </button>
-
-        <!-- Botão para iniciar o jogo Letrix Memória (Associação e Memória) -->
-        <button class="btn-play mode-memoria" onclick="window.location.href='memoria.html'">
-          <span class="btn-icon">🧠</span> Letrix Memória
-        </button>
+      <div class="nav-links" aria-label="Navegação principal">
+        <a class="nav-link active" href="index.html">Início</a>
+        <a class="nav-link" href="dashboard.html">Painel Pedagógico</a>
+        <a class="nav-link" href="portfolio.html">Portfólio</a>
+        <a class="nav-link" href="creditos.html">Créditos</a>
       </div>
 
-      <!-- Fileira de botões secundários utilitários e de controle -->
-      <div class="secondary-btns">
-        <!-- Botão para Baixar / Instalar o aplicativo PWA -->
-        <button class="btn-pwa-install" id="btn-pwa-install" title="Baixar e instalar o Letrix no celular ou computador">
-          <span class="btn-icon">📲</span> Baixar App
-        </button>
-
-        <!-- Botão de acesso ao Painel Pedagógico de métricas educacionais (Dashboard) -->
-        <button class="btn-dashboard" onclick="window.location.href='dashboard.html'">
-          📊 Painel Pedagógico
-        </button>
-
-        <!-- Botão de Login rápido que leva direto ao campo de login do dashboard -->
-        <button class="btn-login" onclick="window.location.href='dashboard.html#login'" title="Login (nome)">
-          🔐 Login
-        </button>
-
-        <!-- Botão para registrar novo usuário (abre modal) -->
-        <button class="btn-register" id="open-register-btn" title="Registrar criança">
-          ✍️ Registrar
-        </button>
-
-        <!-- Botão do Portfólio da Psicóloga -->
-        <button class="btn-portfolio" onclick="window.location.href='portfolio.html'" title="Portfólio da Psicóloga">
-          🧠 Portfólio
-        </button>
-        
-        <!-- Botão para exibir a tela de Créditos dos desenvolvedores e instituição -->
-        <button class="btn-creditos" onclick="window.location.href='creditos.html'">
-          ℹ️ Créditos
-        </button>
-
-        <!-- Botão de som global para Ligar/Desligar a música de fundo -->
-        <button class="btn-som" id="btn-som" onclick="toggleMusica()">
-          🔇
-        </button>
+      <div class="nav-actions">
+        <button class="nav-button nav-login" onclick="window.location.href='dashboard.html#login'">Entrar</button>
+        <button class="nav-button nav-register" id="open-register-btn">Criar conta</button>
       </div>
+    </nav>
+  </header>
+
+  <main class="hero">
+    <section class="hero-copy">
+      <p class="eyebrow">Aprenda com alegria</p>
+      <h1 class="main-title">
+        <span>Aprenda palavras</span>
+        <span class="rainbow-text">brincando!</span>
+      </h1>
+      <p class="subtitle">Jogos divertidos para aprender no seu ritmo.</p>
+    </section>
+
+    <section class="hero-showcase" aria-label="Jogos disponíveis">
+      <div class="mascot-frame">
+        <div class="mascot-badges">
+          <span class="badge badge-red">A</span>
+          <span class="badge badge-blue">B</span>
+          <span class="badge badge-green">C</span>
+        </div>
+        <img src="assets/lion_mascot.png" alt="Mascote Letrix" class="mascot-img-large">
+      </div>
+
+      <div class="game-cards">
+        <a class="game-card coral" href="jogar.html" aria-label="Abrir Letrix Palavras">
+          <div class="card-icon">🔤</div>
+          <h2>Letrix Palavras</h2>
+          <p>Forme palavras e descubra novos mundos!</p>
+          <span class="arrow-btn" aria-hidden="true">→</span>
+        </a>
+
+        <a class="game-card blue" href="drag.html" aria-label="Abrir Letrix Arrastar">
+          <div class="card-icon">🎯</div>
+          <h2>Letrix Arrastar</h2>
+          <p>Arraste as letras e complete as palavras!</p>
+          <span class="arrow-btn" aria-hidden="true">→</span>
+        </a>
+
+        <a class="game-card aqua" href="memoria.html" aria-label="Abrir Letrix Memória">
+          <div class="card-icon">🧠</div>
+          <h2>Letrix Memória</h2>
+          <p>Encontre os pares e treine sua memória!</p>
+          <span class="arrow-btn" aria-hidden="true">→</span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <div class="app-banner" aria-label="Baixar o aplicativo Letrix">
+    <div class="banner-icon">📱</div>
+    <div class="banner-copy">
+      <strong>Baixar o aplicativo Letrix</strong>
+      <span>Experimente toda a diversão offline e em qualquer lugar.</span>
     </div>
+    <button class="banner-button btn-pwa-install" id="btn-pwa-install" title="Baixar e instalar o Letrix no celular ou computador">
+      Baixar Agora
+    </button>
   </div>
+
+  <button class="btn-som" id="btn-som" onclick="toggleMusica()" aria-label="Ligar ou desligar música">
+    🔇
+  </button>
 
   <!-- Configuração Global da API, Gerenciador de Áudio, Banco Offline e PWA -->
   <script src="js/config.js"></script>
