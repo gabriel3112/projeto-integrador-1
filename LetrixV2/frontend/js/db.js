@@ -203,3 +203,52 @@ function limparBancoDados() {
     }).catch(reject);
   });
 }
+
+/**
+ * Remove somente as partidas associadas ao usuário informado.
+ * @param {string} username - Nome do usuário atual
+ * @returns {Promise<void>}
+ */
+function removerPartidasDoUsuario(username) {
+  if (typeof username !== 'string' || !username.trim()) {
+    return Promise.reject(new Error('É necessário informar um usuário para remover partidas.'));
+  }
+
+  return abrirDB().then(db => new Promise((resolve, reject) => {
+    let transaction;
+    try {
+      transaction = db.transaction(STORE_NAME, 'readwrite');
+      const store = transaction.objectStore(STORE_NAME);
+      const request = store.openCursor();
+
+      request.onsuccess = (event) => {
+        const cursor = event.target.result;
+        if (!cursor) return;
+
+        if (cursor.value.user === username) {
+          cursor.delete();
+        }
+        cursor.continue();
+      };
+
+      transaction.oncomplete = () => {
+        db.close();
+        resolve();
+      };
+
+      transaction.onerror = () => {
+        db.close();
+        reject(transaction.error || new Error('Falha ao remover partidas do usuário.'));
+      };
+
+      transaction.onabort = () => {
+        db.close();
+        reject(transaction.error || new Error('A remoção das partidas foi cancelada.'));
+      };
+    } catch (error) {
+      if (transaction) transaction.abort();
+      db.close();
+      reject(error);
+    }
+  }));
+}

@@ -220,6 +220,27 @@
       color: white;
       transform: scale(1.03);
     }
+
+    .btn-action-reset:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+      transform: none;
+    }
+
+    .reset-status {
+      color: #636e72;
+      font-size: 13px;
+      font-weight: 700;
+      min-height: 20px;
+    }
+
+    .reset-status.error {
+      color: #d63031;
+    }
+
+    .reset-status.success {
+      color: #008f72;
+    }
   </style>
 </head>
 <body>
@@ -434,10 +455,12 @@
       </p>
     </div>
 
-    <!-- Botões de Ações e Limpeza de Estatísticas -->
+    <!-- Botões de ações e reinício de progresso -->
     <div class="action-row">
-      <!-- Botão para limpar/resetar o localStorage -->
-      <button class="btn-action-reset" onclick="confirmReset()">🧹 Limpar Estatísticas</button>
+      <div>
+        <button class="btn-action-reset" id="btn-reset-progress" onclick="confirmReset()" disabled>🧹 Reiniciar progresso</button>
+        <div class="reset-status" id="reset-status" role="status" aria-live="polite"></div>
+      </div>
       <!-- Botão para retornar à página inicial -->
       <button class="btn-creditos" onclick="window.location.href='index.html'" style="padding: 12px 25px;">
         🏠 Voltar ao Menu
@@ -457,7 +480,9 @@
 
     function updateUserUI() {
       const area = document.getElementById('user-area');
+      const resetButton = document.getElementById('btn-reset-progress');
       area.innerHTML = '';
+      resetButton.disabled = !window.CURRENT_USER;
       if (window.CURRENT_USER) {
         const span = document.createElement('span');
         span.textContent = 'Usuário: ' + window.CURRENT_USER;
@@ -582,7 +607,7 @@
     // Função que busca dados do IndexedDB e popula a tabela HTML
     function carregarHistoricoTabela() {
       if (typeof obterPartidas === 'function') {
-        obterPartidas().then(partidas => {
+        return obterPartidas().then(partidas => {
           // If a user is logged, filter partidas to that user (records were tagged in db.save)
           if (window.CURRENT_USER) {
             todasPartidas = partidas.filter(p => p.user === window.CURRENT_USER);
@@ -590,10 +615,13 @@
             todasPartidas = partidas;
           }
           renderizarPartidas(todasPartidas);
+          return true;
         }).catch(err => {
           console.error("Erro ao ler dados de histórico:", err);
+          return false;
         });
       }
+      return Promise.resolve(false);
     }
 
     // Função auxiliar de formatação de data
@@ -699,18 +727,72 @@
 
     // Caixa de diálogo de confirmação para limpar o progresso salvo e o banco de dados IndexedDB
     function confirmReset() {
-      if (confirm("Deseja realmente apagar todos os dados de progresso e estatísticas do histórico? Esta ação não pode ser desfeita.")) {
-        // Reset stats for current user if logged, otherwise reset global stats
-        resetStats(window.CURRENT_USER);
-        if (typeof limparBancoDados === 'function') {
-          limparBancoDados().then(() => {
-            carregarHistoricoTabela(); // Recarrega tabela vazia
-            alert("Estatísticas e histórico limpos com sucesso!");
-          }).catch(err => {
-            console.error("Erro ao limpar banco de dados:", err);
-          });
-        }
+      const username = window.CURRENT_USER;
+      if (!username) {
+        mostrarStatusReset('Entre com um usuário para reiniciar o progresso.', 'error');
+        return;
       }
+
+      const confirmado = confirm(
+        `As estatísticas e o histórico local de partidas de ${username} serão reiniciados. ` +
+        'A conta e os dados pessoais serão preservados. Os resultados registrados no servidor não serão apagados. ' +
+        'Esta ação não pode ser desfeita.'
+      );
+      if (!confirmado) return;
+
+      const button = document.getElementById('btn-reset-progress');
+      button.disabled = true;
+      button.textContent = 'Reiniciando...';
+      mostrarStatusReset('', '');
+
+      (async () => {
+        const statsKey = `letrix_stats_${username}`;
+        let previousStats;
+        let statsReset = false;
+
+        try {
+          if (typeof removerPartidasDoUsuario !== 'function') {
+            throw new Error('A função de gerenciamento do histórico não está disponível.');
+          }
+
+          previousStats = localStorage.getItem(statsKey);
+          statsReset = true;
+          resetStats(username);
+          await removerPartidasDoUsuario(username);
+          const historyLoaded = await carregarHistoricoTabela();
+          if (historyLoaded) {
+            mostrarStatusReset('Progresso local reiniciado. Conta e dados pessoais foram preservados.', 'success');
+          } else {
+            mostrarStatusReset('Progresso reiniciado, mas não foi possível atualizar a tabela do histórico.', 'error');
+          }
+        } catch (err) {
+          console.error('Erro ao reiniciar o progresso do usuário:', err);
+          if (statsReset) {
+            try {
+              if (previousStats === null) {
+                localStorage.removeItem(statsKey);
+              } else {
+                localStorage.setItem(statsKey, previousStats);
+              }
+              updateDashboardUI();
+            } catch (rollbackError) {
+              console.error('Erro ao restaurar as estatísticas anteriores:', rollbackError);
+              mostrarStatusReset('Ocorreu um erro e não foi possível restaurar os dados anteriores. Recarregue a página e confira o progresso.', 'error');
+              return;
+            }
+          }
+          mostrarStatusReset('Não foi possível reiniciar o progresso. Os dados anteriores foram mantidos.', 'error');
+        } finally {
+          button.textContent = '🧹 Reiniciar progresso';
+          button.disabled = !window.CURRENT_USER;
+        }
+      })();
+    }
+
+    function mostrarStatusReset(message, type) {
+      const status = document.getElementById('reset-status');
+      status.textContent = message;
+      status.className = `reset-status${type ? ` ${type}` : ''}`;
     }
 
     // Aciona a renderização das estatísticas e tabela de histórico ao carregar o DOM
