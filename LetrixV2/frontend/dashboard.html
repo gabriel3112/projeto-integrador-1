@@ -17,6 +17,7 @@
   <link rel="icon" type="image/png" sizes="512x512" href="assets/icon-512.png">
 
   <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/back-button.css" />
   <style>
     /* Estilos específicos do Dashboard */
     .dashboard-container {
@@ -255,7 +256,7 @@
   <!-- Cabeçalho de Navegação Superior -->
   <div class="header">
     <!-- Botão com elástico em hover para retornar ao index -->
-    <button class="btn-back" onclick="window.location.href='index.html'">←</button>
+    <button class="btn-back" onclick="window.location.href='index.html'" title="Voltar ao menu" aria-label="Voltar ao menu"><span class="btn-back-icon">←</span><span class="btn-back-label">Voltar</span></button>
     <div class="logo-mini">
       <span>L</span><span>E</span><span>T</span><span>R</span><span>I</span><span>X</span>
     </div>
@@ -462,9 +463,7 @@
         <div class="reset-status" id="reset-status" role="status" aria-live="polite"></div>
       </div>
       <!-- Botão para retornar à página inicial -->
-      <button class="btn-creditos" onclick="window.location.href='index.html'" style="padding: 12px 25px;">
-        🏠 Voltar ao Menu
-      </button>
+      <button class="btn-back btn-back--wide" style="margin-top: 0;" onclick="window.location.href='index.html'"><span class="btn-back-icon">←</span><span class="btn-back-label">Voltar ao Menu</span></button>
     </div>
 
   </div>

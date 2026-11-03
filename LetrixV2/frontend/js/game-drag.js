@@ -58,6 +58,8 @@ let timerHandle = null;// Referência do intervalo do cronômetro
 let isDragging  = false;// Rastreia se o foguete está sendo arrastado no momento
 let gameActive  = false;// Define se o jogo está ativo e aceita interação
 let dragOffX    = 0, dragOffY = 0; // Deslocamento de pixels (offset) entre o ponteiro e o centro do foguete
+let lastCx = 0, lastCy = 0; // Último centro válido do foguete (para checar o trajeto entre dois movimentos)
+let hitCooldown = false; // Evita penalidades duplicadas enquanto o foguete volta à largada
 let levelWallHits = 0; // Rastreia a quantidade de colisões com as paredes roxas para estatísticas pedagógicas
 
 // Referências diretas dos Elementos do DOM (HTML)
@@ -255,7 +257,7 @@ function isAtEnd(cx, cy) {
  * Acionado ao clicar/tocar no foguete
  */
 function onDragStart(e) {
-  if (!gameActive) return;
+  if (!gameActive || hitCooldown || isDragging) return;
   if (e && e.cancelable) e.preventDefault();
 
   const drag = document.getElementById('draggable');
@@ -274,6 +276,11 @@ function onDragStart(e) {
   dragOffX = clientX - rect.left;
   dragOffY = clientY - rect.top;
 
+  // Guarda o centro atual do foguete (coordenadas relativas à arena)
+  const arenaRect0 = arena.getBoundingClientRect();
+  lastCx = rect.left + rect.width / 2 - arenaRect0.left;
+  lastCy = rect.top + rect.height / 2 - arenaRect0.top;
+
   // Escuta movimentos em nível de janela (document) para evitar perda de foco rápido
   document.addEventListener('mousemove', onDragMove);
   document.addEventListener('mouseup',   onDragEnd);
@@ -281,6 +288,31 @@ function onDragStart(e) {
   document.addEventListener('touchend',  onDragEnd);
   document.addEventListener('pointermove', onDragMove);
   document.addEventListener('pointerup',   onDragEnd);
+  document.addEventListener('pointercancel', onDragEnd);
+  document.addEventListener('touchcancel', onDragEnd);
+  window.addEventListener('blur', onDragEnd);
+  document.documentElement.addEventListener('mouseleave', onPointerLeavePage);
+}
+
+/**
+ * Se o ponteiro sai da página durante o arrasto, o foguete saiu dos limites: conta como erro
+ */
+function onPointerLeavePage() {
+  if (isDragging && gameActive) onHitWall();
+}
+
+/**
+ * Verifica se todo o trajeto entre dois centros permanece dentro do caminho.
+ * Amostra pontos a cada poucos pixels para que movimentos rápidos não "atravessem" as paredes.
+ */
+function isTrajectoryInside(x0, y0, x1, y1) {
+  const dist = Math.hypot(x1 - x0, y1 - y0);
+  const steps = Math.max(1, Math.ceil(dist / 4));
+  for (let i = 1; i <= steps; i++) {
+    const t = i / steps;
+    if (!isInsidePath(x0 + (x1 - x0) * t, y0 + (y1 - y0) * t)) return false;
+  }
+  return true;
 }
 
 /**
@@ -298,28 +330,29 @@ function onDragMove(e) {
   const clientY = (e.touches && e.touches.length > 0) ? e.touches[0].clientY : (e.clientY !== undefined ? e.clientY : 0);
 
   // Novas posições baseadas na arena e no offset exato de clique
-  let newLeft = clientX - arenaRect.left - dragOffX;
-  let newTop  = clientY - arenaRect.top  - dragOffY;
+  const newLeft = clientX - arenaRect.left - dragOffX;
+  const newTop  = clientY - arenaRect.top  - dragOffY;
 
-  // Limita o movimento estritamente dentro da borda física da arena
-  newLeft = Math.max(0, Math.min(arenaRect.width  - 44, newLeft));
-  newTop  = Math.max(0, Math.min(arenaRect.height - 44, newTop));
+  // Centro do foguete (coordenadas relativas à arena)
+  const cx = newLeft + 22, cy = newTop + 22;
+
+  // Sair dos limites da arena é uma falha (antes o foguete era apenas "preso" na borda)
+  if (cx < 0 || cy < 0 || cx > arenaRect.width || cy > arenaRect.height) {
+    onHitWall();
+    return;
+  }
 
   drag.style.left = newLeft + 'px';
   drag.style.top  = newTop  + 'px';
 
-  // Obtém o centro do foguete para cálculos matemáticos
-  const cx = newLeft + 22, cy = newTop + 22;
-
-  // FASES 1 E 2: Valida colisão de paredes durante a movimentação
-  if (currentLevel < 2) {
-    if (!isInsidePath(cx, cy)) {
-      onHitWall();
-      return;
-    }
+  // Valida colisão com as paredes em todas as fases, incluindo o trajeto desde o último movimento
+  if (!isTrajectoryInside(lastCx, lastCy, cx, cy)) {
+    onHitWall();
+    return;
   }
+  lastCx = cx; lastCy = cy;
 
-  // FASE 3 E DEMAIS: Checa se alcançou o alvo durante a movimentação
+  // Checa se alcançou o alvo durante a movimentação
   if (isAtEnd(cx, cy)) {
     onWin();
   }
@@ -328,8 +361,8 @@ function onDragMove(e) {
 /**
  * Solta o arrasto e limpa os listeners temporários da tela com validação da Drop Zone na Fase 3
  */
-function onDragEnd(e) {
-  if (!isDragging) return;
+function stopDrag() {
+  if (!isDragging) return false;
   isDragging = false;
   const drag = document.getElementById('draggable');
   if (drag) {
@@ -342,6 +375,19 @@ function onDragEnd(e) {
   document.removeEventListener('touchend',  onDragEnd);
   document.removeEventListener('pointermove', onDragMove);
   document.removeEventListener('pointerup',   onDragEnd);
+  document.removeEventListener('pointercancel', onDragEnd);
+  document.removeEventListener('touchcancel', onDragEnd);
+  window.removeEventListener('blur', onDragEnd);
+  document.documentElement.removeEventListener('mouseleave', onPointerLeavePage);
+  return true;
+}
+
+/**
+ * Acionado quando o jogador solta o foguete
+ */
+function onDragEnd(e) {
+  if (!stopDrag()) return;
+  const drag = document.getElementById('draggable');
 
   // Validação ao Soltar (Drop Zone) exclusiva para a Fase 3
   if (gameActive && currentLevel === 2 && drag) {
@@ -420,8 +466,9 @@ function finalizarPartida(nome_paciente, pontuacao, duracao_segundos) {
  * Acionado ao colidir com as paredes roxas
  */
 function onHitWall() {
-  if (!gameActive) return;
-  onDragEnd(); // Cancela o arrasto imediato
+  if (!gameActive || hitCooldown) return;
+  hitCooldown = true;
+  stopDrag(); // Cancela o arrasto imediatamente (sem validar a soltura)
 
   lives--; // Desconta vida
   levelWallHits++; // Incrementa contador de colisões para métricas
@@ -436,6 +483,7 @@ function onHitWall() {
   setTimeout(() => {
     if (drag) drag.classList.remove('error');
     resetDraggable(); // Retorna o foguete para a largada
+    hitCooldown = false;
 
     if (lives <= 0) {
       gameOver(); // Se ficar sem vidas, fim de jogo
@@ -450,7 +498,7 @@ function onWin() {
   if (!gameActive) return;
   gameActive = false;
   clearInterval(timerHandle); // Pausa cronômetro
-  onDragEnd();
+  stopDrag();
 
   const drag = document.getElementById('draggable');
   if (drag) drag.classList.add('win'); // Efeito CSS de giro e sucesso verde
@@ -573,7 +621,8 @@ function initGame() {
   levelWallHits = 0; // Reseta colisões do nível
   timerSec = lv.timeSec; // Ajusta cronômetro da dificuldade
   gameActive = true;
-  isDragging = false;
+  stopDrag();
+  hitCooldown = false;
 
   livesEl.textContent = lives;
   levelEl.textContent = currentLevel + 1;

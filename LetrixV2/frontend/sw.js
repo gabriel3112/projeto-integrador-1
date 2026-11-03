@@ -5,7 +5,7 @@
  * permitindo o funcionamento 100% offline e instalação nativa da aplicação.
  */
 
-const CACHE_NAME = 'letrix-pwa-v3';
+const CACHE_NAME = 'letrix-pwa-v4';
 
 // Lista de arquivos estáticos a serem pré-cacheados na instalação
 const ASSETS_TO_CACHE = [
@@ -23,6 +23,7 @@ const ASSETS_TO_CACHE = [
   './css/drag.css',
   './css/memoria.css',
   './css/portfolio.css',
+  './css/back-button.css',
   './js/config.js',
   './js/audio.js',
   './js/dashboard.js',

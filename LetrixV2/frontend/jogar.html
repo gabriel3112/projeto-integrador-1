@@ -23,6 +23,7 @@
   
   <!-- CSS específico da jogabilidade Letrix Palavras -->
   <link rel="stylesheet" href="css/jogar.css">
+  <link rel="stylesheet" href="css/back-button.css" />
 </head>
 <body>
 
@@ -38,7 +39,7 @@
   <!-- Cabeçalho do Jogo -->
   <div class="header">
     <!-- Botão de retorno ao menu principal com micro-animação elástica -->
-    <button class="btn-back" onclick="window.location.href='index.html'">←</button>
+    <button class="btn-back" onclick="window.location.href='index.html'" title="Voltar ao menu" aria-label="Voltar ao menu"><span class="btn-back-icon">←</span><span class="btn-back-label">Voltar</span></button>
     
     <!-- Mini logotipo do jogo -->
     <div class="logo-mini">
@@ -98,6 +99,9 @@
       <!-- Botão para validar se a palavra digitada está correta (habilitado ao preencher todos os slots) -->
       <button class="btn-confirm" id="btn-confirm" disabled>✓ Confirmar</button>
     </div>
+
+    <!-- Botão para pular a palavra atual e seguir para a próxima (sem perder vida) -->
+    <button class="btn-skip" id="btn-skip" title="Pular esta palavra">⏭ Pular palavra</button>
   </div>
 
   <!-- Overlay modal de feedback (Venceu/Errou/Zerou) -->
