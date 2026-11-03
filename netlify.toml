@@ -1,0 +1,4 @@
+# Static PWA frontend — no build step required.
+[build]
+  publish = "LetrixV2/frontend"
+  command = "echo 'Static site: no build step required'"

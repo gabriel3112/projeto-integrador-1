@@ -104,6 +104,27 @@ body { font-family: 'Nunito', sans-serif; background: #FFF9EC; min-height: 100vh
   gap: 12px;
 }
 
+.nav-actions[hidden] {
+  display: none;
+}
+
+.nav-user-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 220px;
+  padding: 0.8rem 1.1rem;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--purple);
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  box-shadow: inset 0 0 0 1px rgba(108, 92, 231, 0.18);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .nav-button {
   border: none;
   border-radius: 999px;

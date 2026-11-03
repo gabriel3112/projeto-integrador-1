@@ -60,9 +60,13 @@
         <a class="nav-link" href="creditos.html">Créditos</a>
       </div>
 
-      <div class="nav-actions">
+      <div class="nav-actions" id="nav-guest">
         <button class="nav-button nav-login" onclick="window.location.href='dashboard.html#login'">Entrar</button>
         <button class="nav-button nav-register" id="open-register-btn">Criar conta</button>
+      </div>
+      <div class="nav-actions" id="nav-user" hidden>
+        <span class="nav-user-name" title="Usuário conectado">👤 <span id="nav-user-name"></span></span>
+        <button class="nav-button nav-login" id="nav-logout-btn">Sair</button>
       </div>
     </nav>
   </header>
@@ -214,6 +218,32 @@
         window.location.href = 'dashboard.html#login';
       }
     });
+
+    // Mostra o nome do usuário logado no lugar de "Entrar" / "Criar conta"
+    function updateNavUser() {
+      let user = null;
+      try { user = localStorage.getItem('letrix_user'); } catch (e) {}
+      const guest = document.getElementById('nav-guest');
+      const logged = document.getElementById('nav-user');
+      if (user) {
+        document.getElementById('nav-user-name').textContent = user;
+        guest.hidden = true;
+        logged.hidden = false;
+      } else {
+        guest.hidden = false;
+        logged.hidden = true;
+      }
+    }
+
+    document.getElementById('nav-logout-btn').addEventListener('click', () => {
+      try { localStorage.removeItem('letrix_user'); } catch (e) {}
+      updateNavUser();
+    });
+
+    // Mantém o cabeçalho atualizado ao voltar para a página ou ao logar em outra aba
+    window.addEventListener('pageshow', updateNavUser);
+    window.addEventListener('storage', (e) => { if (e.key === 'letrix_user') updateNavUser(); });
+    updateNavUser();
 
     // If page loaded with #register, open modal
     if (location.hash === '#register') {
