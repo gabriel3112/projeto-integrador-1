@@ -1,0 +1,94 @@
+/* =====================================================
+   LETRIX – BOTÃO DE VOLTAR (compartilhado por todas as páginas)
+   Carregado depois do CSS da página para padronizar o visual.
+   ===================================================== */
+
+.btn-back {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: auto;
+  height: 46px;
+  padding: 0 18px 0 6px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #FF8E53 0%, #FF6B6B 100%);
+  color: #fff;
+  font-family: 'Fredoka One', 'Nunito', cursive, sans-serif;
+  font-size: 17px;
+  font-weight: 400;
+  letter-spacing: 0.3px;
+  line-height: 1;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  box-shadow: 0 4px 0 #D9534F, 0 8px 18px rgba(255, 107, 107, 0.35);
+  transition: transform 0.18s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+              box-shadow 0.18s ease, filter 0.18s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Círculo branco com a seta */
+.btn-back .btn-back-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #fff;
+  color: #FF6B6B;
+  font-size: 20px;
+  font-weight: 900;
+  font-family: 'Nunito', sans-serif;
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.08);
+  transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.btn-back:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.05);
+  background: linear-gradient(135deg, #FF8E53 0%, #FF6B6B 100%);
+  color: #fff;
+  box-shadow: 0 6px 0 #D9534F, 0 12px 24px rgba(255, 107, 107, 0.45);
+}
+
+.btn-back:hover .btn-back-icon {
+  transform: translateX(-3px);
+}
+
+.btn-back:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #D9534F, 0 4px 10px rgba(255, 107, 107, 0.3);
+}
+
+.btn-back:focus-visible {
+  outline: 3px solid #74B9FF;
+  outline-offset: 3px;
+}
+
+/* Variante larga, usada nos botões "Voltar ao Menu" no fim das páginas */
+.btn-back.btn-back--wide {
+  height: 52px;
+  padding: 0 26px 0 8px;
+  font-size: 18px;
+  margin-top: 30px;
+}
+
+.btn-back.btn-back--wide .btn-back-icon {
+  width: 38px;
+  height: 38px;
+}
+
+/* Em telas pequenas o cabeçalho mostra só a seta */
+@media (max-width: 420px) {
+  .header .btn-back {
+    padding: 0 6px;
+    width: 46px;
+  }
+  .header .btn-back .btn-back-label {
+    display: none;
+  }
+}

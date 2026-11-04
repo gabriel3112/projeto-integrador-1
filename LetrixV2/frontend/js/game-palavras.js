@@ -309,6 +309,37 @@ function confirmWord() {
 }
 
 /**
+ * Pula a palavra atual: não desconta vida, mas zera a sequência e registra
+ * a palavra como não acertada nas métricas pedagógicas.
+ */
+function skipWord() {
+  if (lives <= 0 || currentIdx >= WORDS.length) return;
+  if (document.getElementById('overlay').classList.contains('show')) return;
+
+  clearInterval(timerInterval);
+  const data = WORDS[currentIdx];
+  const timeSpent = 30 - timerSec;
+
+  streak = 0;
+  document.getElementById('streak-val').textContent = streak;
+
+  if (typeof trackSpellingWord === 'function') {
+    trackSpellingWord(false, false, hintUsed, timeSpent, data.badge);
+  }
+
+  if (typeof salvarPartida === 'function') {
+    salvarPartida({
+      jogo: 'Letrix Palavras',
+      resultado: 'Pulou',
+      tempo: timeSpent,
+      detalhes: `Palavra pulada: ${data.word} | Categoria: ${data.badge}`
+    });
+  }
+
+  showOverlay('⏭', 'Palavra pulada', 'A palavra era ' + data.word, true, 'skip');
+}
+
+/**
  * Evento disparado quando o tempo de 30 segundos se esgota
  */
 function timeUp() {
@@ -353,13 +384,13 @@ function gameOver() {
  * @param {string} sub - Detalhes do feedback (Ex: "A palavra era...")
  * @param {boolean} isWin - Define a estilização do botão de avançar (sucesso/falha)
  */
-function showOverlay(emoji, title, sub, isWin) {
+function showOverlay(emoji, title, sub, isWin, variant) {
   document.getElementById('ov-emoji').textContent = emoji;
   document.getElementById('ov-title').textContent = title;
   document.getElementById('ov-sub').textContent = sub;
   
   const btn = document.getElementById('btn-next');
-  btn.className = 'btn-next ' + (isWin ? 'ok' : 'fail');
+  btn.className = 'btn-next ' + (variant === 'skip' ? 'skip' : (isWin ? 'ok' : 'fail'));
   
   if(!isWin) {
     btn.textContent = '🔄 Jogar de novo';
@@ -406,6 +437,8 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-clear').addEventListener('click', clearAllSlots);
   // Listener do botão de dica
   document.getElementById('hint-btn').addEventListener('click', useHint);
+  // Listener do botão de pular palavra
+  document.getElementById('btn-skip').addEventListener('click', skipWord);
   // Listener do botão de confirmar palavra
   document.getElementById('btn-confirm').addEventListener('click', confirmWord);
   
